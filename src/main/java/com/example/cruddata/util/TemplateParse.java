@@ -1,4 +1,4 @@
-package com.example.cruddata.repository;
+package com.example.cruddata.util;
 
 import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.exception.BusinessException;
@@ -7,6 +7,7 @@ import freemarker.template.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -14,11 +15,11 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class TemplateParse {
-
     private static final Logger log = LoggerFactory.getLogger(TemplateParse.class);
 
-    private static final String TEMPLTE_BASE = "cn/crudapi/crudapi/jdbc";
+    private static final String TEMPLTE_BASE = "app/jdbc";
 
     private String readInputStream(ClassPathResource resource) {
         String value =  null;
