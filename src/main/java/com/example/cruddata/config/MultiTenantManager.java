@@ -6,15 +6,15 @@ import com.example.cruddata.exception.TenantResolvingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -47,7 +47,7 @@ public class MultiTenantManager {
             }
         };
         multiTenantDataSource.setTargetDataSources(tenantDataSources);
-        multiTenantDataSource.setDefaultTargetDataSource(defaultDataSource());
+//        multiTenantDataSource.setDefaultTargetDataSource(defaultDataSource());
         multiTenantDataSource.afterPropertiesSet();
         return multiTenantDataSource;
     }
@@ -112,14 +112,12 @@ public class MultiTenantManager {
         return tenantDataSources.keySet();
     }
 
-    private DriverManagerDataSource defaultDataSource() {
-        DriverManagerDataSource defaultDataSource = new DriverManagerDataSource();
-        defaultDataSource.setDriverClassName("org.h2.Driver");
-        defaultDataSource.setUrl("jdbc:h2:mem:default");
-        defaultDataSource.setUsername("default");
-        defaultDataSource.setPassword("default");
-        return defaultDataSource;
-    }
 
+//    @Bean("defaultDataSource")
+//    @Primary
+//    @ConfigurationProperties(prefix = "spring.datasource")
+//    public DataSource defaultDataSource() {
+//        return DataSourceBuilder.create().build();
+//    }
 
 }

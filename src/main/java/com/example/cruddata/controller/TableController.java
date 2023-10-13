@@ -3,56 +3,50 @@ package com.example.cruddata.controller;
 import com.example.cruddata.config.MultiTenantManager;
 import com.example.cruddata.constant.DataSourceInfo;
 import com.example.cruddata.constant.DatabaseType;
-import com.example.cruddata.dto.ColumnCreated;
-import com.example.cruddata.dto.CreateEntityInfo;
+import com.example.cruddata.dto.web.CreateEntity;
 import com.example.cruddata.exception.*;
-import com.example.cruddata.service.TableService;
+import com.example.cruddata.service.DataService;
+import com.example.cruddata.service.SystemService;
 import io.swagger.annotations.Api;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Api(tags ="資料源-資料表表")
 @RestController
 @RequestMapping("/api/metadata/tables")
+@RequiredArgsConstructor
 public class TableController {
 
     private static final Logger log = LoggerFactory.getLogger(TableController.class);
 
-    private final MultiTenantManager tenantManager;
+    private final SystemService systemService;
 
-    private final TableService tableService;
-
-    public TableController(TableService tableService, MultiTenantManager tenantManager) {
-        this.tableService = tableService;
-        this.tenantManager = tenantManager;
-    }
 
     @PostMapping
-    public ResponseEntity<?> createTable(@RequestBody CreateEntityInfo createEntityInfo, @RequestHeader(value = "X-TenantID") String tenantId) {
+    public ResponseEntity<?> createTable(@RequestBody CreateEntity createEntity, @RequestHeader(value = "X-TenantID") String tenantId) {
 
-        log.info("[i] create table info {}", createEntityInfo);
+        log.info("[i] create table info {}", createEntity);
 
 
-        if (createEntityInfo.getTableName().isEmpty()  || createEntityInfo.getColumnEntityList().isEmpty()) {
+        if (createEntity.getTableName().isEmpty()  || createEntity.getColumnEntityList().isEmpty()) {
             log.error("[!] Received database params are incorrect or not full!");
-            throw new InvalidDbPropertiesException();
+            return ResponseEntity.ok(new InvalidDbPropertiesException());
         }
 
         try {
-            String dbName = DatabaseType.POSTSQL;
-            DataSourceInfo.setTenant(this.tenantManager ,tenantId);
+            systemService.createTable( createEntity, Long.valueOf(tenantId));
             log.info("[i] Loaded DataSource for tenant '{}'.", tenantId);
-            tableService.createTable(dbName ,  createEntityInfo);
-            return ResponseEntity.ok(createEntityInfo);
-        } catch (SQLException e) {
-            throw new LoadDataSourceException(e);
+
+
+            return ResponseEntity.ok(createEntity);
+        } catch (Exception e) {
+            return ResponseEntity.ok(e);
+//            throw new LoadDataSourceException(e);
         }
     }
 

@@ -1,6 +1,6 @@
 package com.example.cruddata.controller;
 
-import com.example.cruddata.dto.SystemConfigDto;
+import com.example.cruddata.dto.web.SystemConfigEntity;
 import com.example.cruddata.service.SystemService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class SystemController {
     @Autowired
     SystemService systemService;
     @GetMapping("system")
-    public ResponseEntity<List<SystemConfigDto>> getSystemConfigs(){
-        return new ResponseEntity<List<SystemConfigDto>>(this.systemService.getSystemConfigs(), HttpStatus.OK);
+    public ResponseEntity<List<SystemConfigEntity>> getSystemConfigs(){
+        return null;
     }
 }

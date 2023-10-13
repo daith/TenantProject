@@ -1,7 +1,7 @@
 package com.example.cruddata.entity.system;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import com.example.cruddata.entity.BasicEntity;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,9 +9,10 @@ import java.util.Date;
 
 @Data
 @Entity
-public class SystemDataSource {
+public class DataSourceConfig extends BasicEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
     public String name;
     public String caption;
@@ -19,7 +20,7 @@ public class SystemDataSource {
     public Integer displayOrder;
     public Date createTime;
     public Date updateTime;
-    public Date ownerId;
+
     public Integer updateById;
     public Integer createById;
     public String status;
@@ -35,5 +36,11 @@ public class SystemDataSource {
     public String businessTablePrefix;
     public String businessDatabaseNaming;
 
+    public String tenantId;
+
+    public void preInsert() {
+        super.preInsert();;
+        this.status =(this.status == null)  ?"ACTIVE" :this.status;
+    }
 
 }

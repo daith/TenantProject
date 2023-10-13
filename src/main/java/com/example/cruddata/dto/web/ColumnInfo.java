@@ -1,9 +1,9 @@
-package com.example.cruddata.dto;
+package com.example.cruddata.dto.web;
 
 import lombok.Data;
 
 @Data
-public class ColumnCreated {
+public class ColumnInfo {
     public String dataType;
     public String name;
     public String defaultValue;

@@ -13,7 +13,9 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,6 +28,7 @@ import static java.lang.String.format;
 
 @ComponentScan({"com.example", "com.example.cruddata"})
 @ServletComponentScan(basePackages = {"com.example"})
+@EnableJpaRepositories({"com.example.cruddata.repository"})
 @EnableAsync
 @SpringBootApplication
 public class CrudDataApplication {

@@ -1,9 +1,9 @@
-package com.example.cruddata.dto;
+package com.example.cruddata.dto.web;
 
 import lombok.Data;
 
 @Data
-public class SystemConfigDto {
+public class SystemConfigEntity {
 
 
     public Long id;

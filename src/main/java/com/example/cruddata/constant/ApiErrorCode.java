@@ -10,6 +10,11 @@ public class ApiErrorCode {
     public static final String JSON_ERROR = "JSON_ERROR";
     public static final String SQL_ERROR = "SQL_ERROR";
 
+    public static final String TENANT_TABLE_NOT_EXITS_ERROR = "TENANT_TABLE_NOT_EXITS_ERROR";
+
+    public static final String COLUMNS_OF_TABLE_DELETE_NOT_CLEAR = "COLUMNS_OF_TABLE_DELETE_NOT_CLEAR";
+
+
     public static final String API_RESOURCE_NOT_FOUND = "API_RESOURCE_NOT_FOUND";
     public static final String AUTH_UNAUTHORIZED = "UNAUTHORIZED";
     public static final String AUTH_FORBIDDEN = "FORBIDDEN";
