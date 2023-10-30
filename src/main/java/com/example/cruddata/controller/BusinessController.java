@@ -1,6 +1,6 @@
 package com.example.cruddata.controller;
 
-import com.example.cruddata.dto.web.UpdateDataEntity;
+import com.example.cruddata.dto.web.UpdateEntityData;
 import com.example.cruddata.service.DataService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class BusinessController {
 
     @PostMapping("/{tableName}")
     @ResponseBody
-    public String updateDataByList(@RequestHeader(value = "X-TenantID") String tenantId,@PathVariable String tableName ,@RequestBody UpdateDataEntity payload ) {
+    public String updateDataByList(@RequestHeader(value = "X-TenantID") String tenantId,@PathVariable String tableName ,@RequestBody UpdateEntityData payload ) {
        /*
        *
        * 1. 取得 tenantId 下的 tableName 的欄位資訊

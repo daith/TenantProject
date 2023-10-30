@@ -3,7 +3,7 @@ package com.example.cruddata.dto.web;
 import lombok.Data;
 
 @Data
-public class SystemConfigEntity {
+public class SystemConfigEntityData {
 
 
     public Long id;

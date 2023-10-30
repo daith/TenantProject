@@ -25,4 +25,24 @@ public class ColumnConsts {
     public static final String METADATA_DATABASE_NAMING = "metadata_database_naming";
     public static final String BUSINESS_TABLE_PREFIX = "business_table_prefix";
     public static final String BUSINESS_DATABASE_NAMING = "business_database_naming";
+
+    public static final String DATA_TYPE_INT = "INT";
+    public static final String DATA_TYPE_BOOL = "BOOL";
+
+    public static final String DATA_TYPE_BIGINT = "BIGINT";
+
+    public static final String DATA_TYPE_FLOAT = "FLOAT";
+
+    public static final String DATA_TYPE_DOUBLE = "DOUBLE";
+
+    public static final String DATA_TYPE_DECIMAL = "DECIMAL";
+
+    public static final String DATA_TYPE_DATE = "DATE";
+
+    public static final String DATA_TYPE_CHAR = "CHAR";
+
+    public static final String DATA_TYPE_VARCHAR = "VARCHAR";
+
+    public static final String DATA_TYPE_TEXT = "TEXT";
+
 }

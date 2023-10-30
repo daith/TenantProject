@@ -1,4 +1,4 @@
-INSERT INTO public.tenant2
+INSERT INTO public.${tableName}
 (
 <#list columnNameList as columnName>
   "${columnName.name}" <#if columnName_has_next>,</#if>
@@ -11,39 +11,39 @@ VALUES
     <#assign  key=columnName.name/>
     <#if columnName.dataType == "BOOL">
       ${record[key]!columnName.defaultValue} <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "INT">
+    <#elseif columnName.dataType == "INT">
       ${record[key]!columnName.defaultValue} <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "BIGINT">
+    <#elseif columnName.dataType == "BIGINT">
       ${record[key]!columnName.defaultValue} <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "FLOAT">
+    <#elseif columnName.dataType == "FLOAT">
       ${record[key]!columnName.defaultValue} <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "DOUBLE">
+    <#elseif columnName.dataType == "DOUBLE">
       ${record[key]!columnName.defaultValue} <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "DECIMAL">
+    <#elseif columnName.dataType == "DECIMAL">
       ${record[key]!columnName.defaultValue} <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "DATE">
+    <#elseif columnName.dataType == "DATE">
      ' ${record[key]!columnName.defaultValue}' <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "TIME">
+    <#elseif columnName.dataType == "TIME">
      ' ${record[key]!columnName.defaultValue}' <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "DATETIME">
+    <#elseif columnName.dataType == "DATETIME">
      ' ${record[key]!columnName.defaultValue} '<#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "TIMESTAMP">
+    <#elseif columnName.dataType == "TIMESTAMP">
       '${record[key]!columnName.defaultValue}' <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "CHAR">
+    <#elseif columnName.dataType == "CHAR">
       '${record[key]!columnName.defaultValue} '<#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "VARCHAR">
+    <#elseif columnName.dataType == "VARCHAR">
      ' ${record[key]!columnName.defaultValue}' <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "PASSWORD">
+    <#elseif columnName.dataType == "PASSWORD">
       '${record[key]!columnName.defaultValue}' <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "ATTACHMENT">
+    <#elseif columnName.dataType == "ATTACHMENT">
       '${record[key]!columnName.defaultValue} '<#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "TEXT">
+    <#elseif columnName.dataType == "TEXT">
       '${record[key]!columnName.defaultValue}' <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "LONGTEXT">
+    <#elseif columnName.dataType == "LONGTEXT">
      ' ${record[key]!columnName.defaultValue}' <#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "BLOB">
+    <#elseif columnName.dataType == "BLOB">
       '${record[key]!columnName.defaultValue} '<#if columnName_has_next>,</#if>
-    <#elseif columnEntity.dataType == "LONGBLOB">
+    <#elseif columnName.dataType == "LONGBLOB">
       '${record[key]!columnName.defaultValue}' <#if columnName_has_next>,</#if>
     <#else>
       '${record[key]!columnName.defaultValue}' <#if columnName_has_next>,</#if>
@@ -51,3 +51,4 @@ VALUES
   </#list>
   )<#if record_has_next>,</#if>
 </#list>;
+

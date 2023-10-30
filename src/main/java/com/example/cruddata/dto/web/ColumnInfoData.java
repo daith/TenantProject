@@ -3,7 +3,7 @@ package com.example.cruddata.dto.web;
 import lombok.Data;
 
 @Data
-public class ColumnInfo {
+public class ColumnInfoData {
     public String dataType;
     public String name;
     public String defaultValue;

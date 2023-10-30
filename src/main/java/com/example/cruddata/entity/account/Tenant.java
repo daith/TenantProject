@@ -1,5 +1,6 @@
 package com.example.cruddata.entity.account;
 
+import com.example.cruddata.entity.BasicEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,7 +9,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Tenant {
+public class Tenant extends BasicEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
@@ -16,5 +17,10 @@ public class Tenant {
 
     String status;
 
-    Boolean isDeleted;
+
+
+    public void preInsert() {
+        super.preInsert();;
+        this.status =(this.status == null)  ?"ACTIVE" :this.status;
+    }
 }

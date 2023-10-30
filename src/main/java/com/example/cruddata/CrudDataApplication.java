@@ -1,13 +1,11 @@
 package com.example.cruddata;
 
-import com.example.cruddata.config.MultiTenantManager;
-import com.example.cruddata.controller.BusinessController;
+import com.example.cruddata.config.MultiDataSourceManager;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -15,7 +13,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,48 +30,25 @@ import static java.lang.String.format;
 @SpringBootApplication
 public class CrudDataApplication {
 
-    private final MultiTenantManager tenantManager;
+    private final MultiDataSourceManager multiDataSourceManager;
 
     private static final Logger log = LoggerFactory.getLogger(CrudDataApplication.class);
 
 
-    public CrudDataApplication(MultiTenantManager tenantManager) {
-        this.tenantManager = tenantManager;
-        this.tenantManager.setTenantResolver(CrudDataApplication::tenantResolver);
+    public CrudDataApplication(MultiDataSourceManager multiDataSourceManager) {
+        this.multiDataSourceManager = multiDataSourceManager;
+        this.multiDataSourceManager.setDataSourceResolver(CrudDataApplication::tenantResolver);
     }
 
     /**
      * Load tenant datasource properties from the folder 'tenants/onStartUp`
      * when the app has started.
      */
-    @SneakyThrows(IOException.class)
+
     @EventListener
     public void onReady(ApplicationReadyEvent event) {
 
-        File[] files = Paths.get("tenants/onStartUp").toFile().listFiles();
-
-        if (files == null) {
-            log.warn("[!] Tenant property files not found at ./tenants/onStartUp folder!");
-            return;
-        }
-
-        for (File propertyFile : files) {
-            Properties tenantProperties = new Properties();
-            tenantProperties.load(new FileInputStream(propertyFile));
-
-            String tenantId = tenantProperties.getProperty("id");
-            String url = tenantProperties.getProperty("url");
-            String username = tenantProperties.getProperty("username");
-            String password = tenantProperties.getProperty("password");
-            String drive = tenantProperties.getProperty("drive");
-
-            try {
-                tenantManager.addTenant(tenantId, url, username, password,drive);
-                log.info("[i] Loaded DataSource for tenant '{}'.", tenantId);
-            } catch (SQLException e) {
-                log.error(format("[!] Could not load DataSource for tenant '%s'!", tenantId), e);
-            }
-        }
+        multiDataSourceManager.initDataSource();
     }
 
     /**

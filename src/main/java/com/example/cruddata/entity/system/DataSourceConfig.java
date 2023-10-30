@@ -1,5 +1,6 @@
 package com.example.cruddata.entity.system;
 
+import com.example.cruddata.constant.Status;
 import com.example.cruddata.entity.BasicEntity;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -36,11 +37,11 @@ public class DataSourceConfig extends BasicEntity {
     public String businessTablePrefix;
     public String businessDatabaseNaming;
 
-    public String tenantId;
+    public Long tenantId;
 
     public void preInsert() {
         super.preInsert();;
-        this.status =(this.status == null)  ?"ACTIVE" :this.status;
+        this.status =(this.status == null)  ? Status.ACTIVE :this.status;
     }
 
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class UpdateDataEntity {
+public class UpdateEntityData {
     public Integer totalRecordCount;
     public List<Map> recordList;
 }

@@ -5,12 +5,12 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class CreateEntity {
+public class CreateEntityData {
 
     public String tableName;
 
     public Long datasourceId;
 
     public String caption;
-    public List<ColumnInfo> columnEntityList;
+    public List<ColumnInfoData> columnEntityList;
 }

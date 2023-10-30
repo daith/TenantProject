@@ -1,12 +1,15 @@
 package com.example.cruddata.controller;
 
-import com.example.cruddata.config.MultiTenantManager;
+import com.example.cruddata.config.MultiDataSourceManager;
+import com.example.cruddata.dto.business.TenantData;
+import com.example.cruddata.entity.account.Tenant;
 import com.example.cruddata.exception.InvalidDbPropertiesException;
 import com.example.cruddata.exception.LoadDataSourceException;
+import com.example.cruddata.service.TenantService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,15 +24,29 @@ public class TenantController {
     private static final Logger log = LoggerFactory.getLogger(TenantController.class);
 
 
-    private final MultiTenantManager tenantManager;
+    private final MultiDataSourceManager datasourceManager;
+
+    private final TenantService tenantService;
 
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok(tenantManager.getTenantList());
+    public ResponseEntity<?> getAllTenantByStatus(@RequestParam(name = "idDelete" ,required = false)String idDelete , @RequestParam(name = "status",required = false) String status) {
+        return ResponseEntity.ok(tenantService.getAllTenantByStatus(null == idDelete ? null:Boolean.valueOf(idDelete),status));
     }
 
     @PostMapping
+    public ResponseEntity<?> addTenant(@RequestBody TenantData tenantData) {
+        Tenant tenant =new Tenant();
+        tenant.setCompanyName(tenantData.getCompanyName());
+        try {
+            tenantService.addTenant( tenant);
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.ok( e);
+        }
+        return ResponseEntity.ok( tenant);
+    }
+
+
     public ResponseEntity<?> add(@RequestBody Map<String, String> dbProperty) {
 
         log.info("[i] Received add new tenant params request {}", dbProperty);
@@ -46,7 +63,7 @@ public class TenantController {
         }
 
         try {
-            tenantManager.addTenant(tenantId, url, username, password,drive);
+            datasourceManager.addDataSource(tenantId, url, username, password,drive);
             log.info("[i] Loaded DataSource for tenant '{}'.", tenantId);
             return ResponseEntity.ok(dbProperty);
         } catch (SQLException e) {

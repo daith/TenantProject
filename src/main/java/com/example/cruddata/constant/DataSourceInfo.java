@@ -1,7 +1,6 @@
 package com.example.cruddata.constant;
 
-import com.example.cruddata.config.MultiTenantManager;
-import com.example.cruddata.controller.TenantController;
+import com.example.cruddata.config.MultiDataSourceManager;
 import com.example.cruddata.exception.InvalidDbPropertiesException;
 import com.example.cruddata.exception.InvalidTenantIdExeption;
 import com.example.cruddata.exception.TenantNotFoundException;
@@ -19,17 +18,17 @@ public class DataSourceInfo {
     public static final String MSG_INVALID_DB_PROPERTIES_ID = "[!] DataSource properties related to the given tenant ('{}') is invalid!";
     public static final String MSG_RESOLVING_TENANT_ID = "[!] Could not resolve tenant ID '{}'!";
 
-    public  static void setTenant(MultiTenantManager tenantManager , String tenantId) {
+    public  static void setTenant(MultiDataSourceManager tenantManager , String dataSourceId) {
         try {
-            tenantManager.setCurrentTenant(tenantId);
+            tenantManager.setCurrentDataSource(dataSourceId);
         } catch (SQLException e) {
-            log.error(MSG_INVALID_DB_PROPERTIES_ID, tenantId);
+            log.error(MSG_INVALID_DB_PROPERTIES_ID, dataSourceId);
             throw new InvalidDbPropertiesException();
         } catch (TenantNotFoundException e) {
-            log.error(MSG_INVALID_TENANT_ID, tenantId);
+            log.error(MSG_INVALID_TENANT_ID, dataSourceId);
             throw new InvalidTenantIdExeption();
         } catch (TenantResolvingException e) {
-            log.error(MSG_RESOLVING_TENANT_ID, tenantId);
+            log.error(MSG_RESOLVING_TENANT_ID, dataSourceId);
             throw new InvalidTenantIdExeption();
         }
     }

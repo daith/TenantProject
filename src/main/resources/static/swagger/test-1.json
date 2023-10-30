@@ -1,0 +1,435 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenAPI test-1",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8888",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/tenants": {
+      "get": {
+        "tags": [
+          "tenant-controller"
+        ],
+        "summary": "Update an existing pet",
+        "operationId": "findPetsByTags",
+        "description": "Update an existing pet by Id",
+        "parameters":[
+          {
+            "name": "X-TenantID",
+            "in": "header",
+            "description": "Update an existing pet by Id",
+            "example": "$ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recordList",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/CreateEntity"
+                }
+              }
+            }
+          }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },"400": {
+            "description": "Invalid ID supplied"
+          },"404": {
+            "description": "Not found"
+          },"405": {
+            "description": "Validation exception"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "tenant-controller"
+        ],
+        "operationId": "add",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/{tableName}": {
+      "post": {
+        "tags": [
+          "model-controller"
+        ],
+        "operationId": "insertData",
+        "parameters": [
+          {
+            "name": "X-TenantID",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recordList",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/metadata/tables": {
+      "post": {
+        "tags": [
+          "table-controller"
+        ],
+        "operationId": "createTable",
+        "parameters": [
+          {
+            "name": "X-TenantID",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEntity"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/business/data/{tableName}": {
+      "post": {
+        "tags": [
+          "business-controller"
+        ],
+        "operationId": "updateDataByList",
+        "parameters": [
+          {
+            "name": "X-TenantID",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDataEntity"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "business-controller"
+        ],
+        "operationId": "deleteDataByList",
+        "parameters": [
+          {
+            "name": "X-TenantID",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models": {
+      "get": {
+        "tags": [
+          "model-controller"
+        ],
+        "operationId": "getAll_1",
+        "parameters": [
+          {
+            "name": "X-TenantID",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/system/system": {
+      "get": {
+        "tags": [
+          "system-controller"
+        ],
+        "operationId": "getSystemConfigs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SystemConfigEntity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ColumnInfo": {
+        "type": "object",
+        "properties": {
+          "dataType": {
+            "type": "string",
+            "description": "說明：欄位類型（Boolean|String|Int|date）",
+            "example": "Boolean",
+            "required": false
+          },
+          "name": {
+            "type": "string"
+          },
+          "defaultValue": {
+            "type": "string"
+          },
+          "nullable": {
+            "type": "boolean"
+          },
+          "autoIncrement": {
+            "type": "boolean"
+          },
+          "indexType": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "length": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreateEntity": {
+        "type": "object",
+        "properties": {
+          "tableName": {
+            "type": "string"
+          },
+          "datasourceId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "columnEntityList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ColumnInfo"
+            }
+          }
+        }
+      },
+      "UpdateDataEntity": {
+        "type": "object",
+        "properties": {
+          "totalRecordCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "recordList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "SystemConfigEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "isDefault": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

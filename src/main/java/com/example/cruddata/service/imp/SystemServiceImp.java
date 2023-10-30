@@ -1,11 +1,10 @@
 package com.example.cruddata.service.imp;
 
-import com.example.cruddata.config.MultiTenantManager;
+import com.example.cruddata.config.MultiDataSourceManager;
 import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.constant.DataSourceInfo;
-import com.example.cruddata.dto.business.ColumnValidatorResult;
-import com.example.cruddata.dto.web.CreateEntity;
-import com.example.cruddata.entity.account.Tenant;
+import com.example.cruddata.dto.business.ColumnValidatorResultData;
+import com.example.cruddata.dto.web.CreateEntityData;
 import com.example.cruddata.entity.system.ColumnConfig;
 import com.example.cruddata.entity.system.DataSourceConfig;
 import com.example.cruddata.entity.system.TableConfig;
@@ -13,9 +12,9 @@ import com.example.cruddata.exception.BusinessException;
 import com.example.cruddata.repository.system.ColumnConfigRepository;
 import com.example.cruddata.repository.system.DataSourceConfigRepository;
 import com.example.cruddata.repository.system.TableConfigRepository;
-import com.example.cruddata.repository.system.TenantRepository;
 import com.example.cruddata.service.DataService;
 import com.example.cruddata.service.SystemService;
+import com.example.cruddata.service.TenantService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +40,10 @@ public class SystemServiceImp implements SystemService {
     DataService dataService;
 
     @Autowired
-    TenantRepository tenantRepository;
+    TenantService tenantService;
 
     @Autowired
-    MultiTenantManager tenantManager;
+    MultiDataSourceManager dataSourceManager;
 
 
 
@@ -72,7 +71,7 @@ public class SystemServiceImp implements SystemService {
         });
 
 
-        ColumnValidatorResult columnValidatorResult =columnsDataValidationProcess(ColumnConfigByTableIdTable);
+        ColumnValidatorResultData columnValidatorResult =columnsDataValidationProcess(ColumnConfigByTableIdTable);
 
         if(!columnValidatorResult.isValidateCorrect()){
             Map<String,Object> errorMsg = new HashMap<>();
@@ -102,8 +101,8 @@ public class SystemServiceImp implements SystemService {
 
     }
 
-    private ColumnValidatorResult columnsDataValidationProcess(Map<Long, Map<Long, List<ColumnConfig>>> ColumnConfigByTableIdTable) {
-        ColumnValidatorResult columnValidatorResult = new ColumnValidatorResult();
+    private ColumnValidatorResultData columnsDataValidationProcess(Map<Long, Map<Long, List<ColumnConfig>>> ColumnConfigByTableIdTable) {
+        ColumnValidatorResultData columnValidatorResult = new ColumnValidatorResultData();
         Map<Long,List<String>> notExitTableByTenant = new HashMap<>();
         Map<Long,Map<String,Map<String,List<String>>>> totalColumnsBySituationTableTenant  = new HashMap<>();
         columnValidatorResult.setTotalColumnsBySituationTableTenant(totalColumnsBySituationTableTenant );
@@ -125,7 +124,7 @@ public class SystemServiceImp implements SystemService {
 
                 /* 判斷此客戶的表下，確認欄位是否都刪除，若未都刪除，不給刪除 */
                 if(key.equals(table.getTenantId()) &&  !table.getIsDeleted()){
-                    List<ColumnConfig> columnUsedInDb =this.columnConfigRepository.findColumnConfigByTableId(table.getId()).stream().filter(columnConfig -> !columnConfig.getIsDeleted()).collect(Collectors.toList());
+                    List<ColumnConfig> columnUsedInDb =this.columnConfigRepository.findByTenantIdAndIsDeletedAndTableId(table.getTenantId(),Boolean.FALSE,table.getId()).stream().filter(columnConfig -> !columnConfig.getIsDeleted()).collect(Collectors.toList());
                     List<ColumnConfig> userDeleteColumns = ColumnConfigByTableIdTable.get(table.getTenantId()).get(table.getId());
 
                     if(!columnUsedInDb.retainAll(userDeleteColumns)){
@@ -152,10 +151,7 @@ public class SystemServiceImp implements SystemService {
         return columnValidatorResult;
     }
 
-    @Override
-    public void deleteDataSourceConfig(DataSourceConfig recordList) {
 
-    }
 
     @Override
     public void deleteTableConfig(TableConfig recordList) {
@@ -167,10 +163,7 @@ public class SystemServiceImp implements SystemService {
 
     }
 
-    @Override
-    public void updateDataSourceConfig(DataSourceConfig recordList) {
 
-    }
 
     @Override
     public void updateTableConfig(TableConfig recordList) {
@@ -178,18 +171,16 @@ public class SystemServiceImp implements SystemService {
     }
 
     @Override
-    public void createTable(CreateEntity createEntity, Long tenantId) throws SQLException {
+    public void createTable(CreateEntityData createEntity, Long tenantId) throws SQLException {
         log.info("process createTable start!");
 
-        Optional<Tenant> tenant = this.tenantRepository.findById(tenantId);
-        if(!tenant.isPresent() && tenant.get().getIsDeleted() == true){
-            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "tenantId is not useful");
+        tenantService.validatedTenantProcess(tenantId);
+
+        Optional<DataSourceConfig> dataSourceConfig = this.dataSourceConfigRepository.findByIdAndTenantIdAndIsDeleted(createEntity.getDatasourceId(),tenantId,Boolean.FALSE);
+        if(!dataSourceConfig.isPresent()){
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "datasource is not exist or you cant use this datasource");
         }
 
-       Optional<DataSourceConfig> dataSourceConfig = this.dataSourceConfigRepository.findById(createEntity.getDatasourceId());
-       if(!dataSourceConfig.isPresent() && dataSourceConfig.get().getIsDeleted() == true){
-           throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "datasource is not exist or you cant use this datasource");
-       }
 
        List<TableConfig> tables =this.tableConfigRepository.findTableConfigByNameAndTenantIdAndIsDeletedAndDataSourceId(createEntity.getTableName(),tenantId,Boolean.FALSE,createEntity.getDatasourceId());
        if(tables.size() > 0){
@@ -198,8 +189,7 @@ public class SystemServiceImp implements SystemService {
 
         log.info("process data validator done!");
 
-        DataSourceInfo.setTenant(this.tenantManager ,String.valueOf(tenantId));
-        dataService.createTable(dataSourceConfig.get().getDatabaseType() , createEntity);
+        dataService.createTable(dataSourceConfig.get().getId() , dataSourceConfig.get().getDatabaseType() , createEntity);
 
         log.info("process create physical table done!");
 
@@ -219,11 +209,12 @@ public class SystemServiceImp implements SystemService {
             record.setName(item.getName());
             record.setTableId(tableConfig.getId());
             record.setTenantId(tenantId);
+            record.setDataType(item.getDataType());
             record.setIsDeleted(Boolean.FALSE);
             columnConfigs.add(record);
         });
         this.columnConfigRepository.saveAll(columnConfigs);
-        log.info("process insert columnConfigs  done!");
+        log.info("process insert columnConfigs done!");
 
         log.info("process createTable end!");
     }
@@ -233,13 +224,28 @@ public class SystemServiceImp implements SystemService {
         return null;
     }
 
-    @Override
-    public List<TableConfig> getTableConfigs(TableConfig recordList) {
-        return null;
-    }
+
 
     @Override
     public List<ColumnConfig> getColumnConfigs(TableConfig recordList) {
         return null;
     }
+
+    @Override
+    public List<TableConfig> getTableConfigs(Long dataSourceId, String tableName, Long tenantId) {
+        tenantService.validatedTenantProcess(tenantId);
+
+        Optional<DataSourceConfig> dataSourceConfig = this.dataSourceConfigRepository.findByIdAndTenantIdAndIsDeleted(dataSourceId, tenantId,Boolean.FALSE);
+        if(!dataSourceConfig.isPresent()){
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "datasource is not exist or you cant use this datasource");
+        }
+
+        List<TableConfig> tables =this.tableConfigRepository.findTableConfigByNameAndTenantIdAndIsDeletedAndDataSourceId(tableName, tenantId,Boolean.FALSE, dataSourceId);
+        if(tables.size() != 1){
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "table name  multiple in this datasource",tables);
+        }
+        return tables;
+    }
+
+
 }

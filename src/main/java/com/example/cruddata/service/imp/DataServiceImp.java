@@ -1,12 +1,13 @@
 package com.example.cruddata.service.imp;
 
-import com.example.cruddata.config.MultiTenantManager;
+import com.example.cruddata.config.MultiDataSourceManager;
+import com.example.cruddata.constant.DataSourceInfo;
 import com.example.cruddata.constant.TemplateBase;
 import com.example.cruddata.controller.TableController;
-import com.example.cruddata.dto.web.CreateEntity;
-import com.example.cruddata.dto.web.InsertDataEntity;
+import com.example.cruddata.dto.web.CreateEntityData;
+import com.example.cruddata.dto.web.InsertEntityData;
+import com.example.cruddata.entity.system.ColumnConfig;
 import com.example.cruddata.service.DataService;
-import com.example.cruddata.service.SystemService;
 import com.example.cruddata.util.TemplateParse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ public class DataServiceImp implements DataService {
     private static final Logger log = LoggerFactory.getLogger(TableController.class);
 
     @Autowired
-    MultiTenantManager multiTenantManager;
+    MultiDataSourceManager multiDataSourceManager;
     @Autowired
     TemplateParse templateParse;
 
@@ -36,15 +37,15 @@ public class DataServiceImp implements DataService {
 
 
     @Override
-    public void createTable( String dbName  , CreateEntity createEntity) throws SQLException {
+    public void createTable(Long dataSource ,  String dbName  , CreateEntityData createEntity) throws SQLException {
 
         try{
+            DataSourceInfo.setTenant(this.multiDataSourceManager,String.valueOf(dataSource));
+
             String sql =  templateParse.processTemplateToString(dbName , TemplateBase.CREATE_TABLE, createEntity);
             log.info("[i] Build SQL'{}' from template '{}'.", sql , TemplateBase.CREATE_TABLE);
-            PreparedStatement preparedStatement = multiTenantManager.dataSource().getConnection().prepareStatement(sql);
+            PreparedStatement preparedStatement = multiDataSourceManager.dataSource().getConnection().prepareStatement(sql);
             preparedStatement.execute();
-
-
 
         }catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
@@ -56,16 +57,21 @@ public class DataServiceImp implements DataService {
     }
 
     @Override
-    public void insertData(String dbName, List<Map<String, Object>> recordList) throws SQLException {
+    public void insertData(Long dataSource , String dbName, InsertEntityData insertDataEntity) throws SQLException {
         try{
-            InsertDataEntity insertDataEntity = new InsertDataEntity();
-            insertDataEntity.setRecordList(recordList);
-            String sql =  templateParse.processTemplateToString(dbName , TemplateBase.INSERT_DATA, insertDataEntity);
-            log.info("[i] Build SQL'{}' from template '{}'.", sql , TemplateBase.CREATE_TABLE);
-            PreparedStatement preparedStatement = multiTenantManager.dataSource().getConnection().prepareStatement(sql);
-            preparedStatement.execute();
+            if(insertDataEntity.getRecordList().size()!=0){
+                DataSourceInfo.setTenant(this.multiDataSourceManager,String.valueOf(dataSource));
+
+                String sql =  templateParse.processTemplateToString(dbName , TemplateBase.INSERT_DATA, insertDataEntity);
+                log.info("[i] Build SQL'{}' from template '{}'.", sql , TemplateBase.INSERT_DATA);
+                PreparedStatement preparedStatement = multiDataSourceManager.dataSource().getConnection().prepareStatement(sql);
+                preparedStatement.execute();
+            }else {
+                log.info("[insertData-i] No data need import");
+            }
+
         }catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            log.info("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
             throw new SQLException(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,7 +93,7 @@ public class DataServiceImp implements DataService {
 
             });
             log.info("[i] Build SQL'{}' from template '{}'.", sqlBuilder.toString() , TemplateBase.DROP_COLUMN);
-            PreparedStatement preparedStatement = multiTenantManager.dataSource().getConnection().prepareStatement(sqlBuilder.toString());
+            PreparedStatement preparedStatement = multiDataSourceManager.dataSource().getConnection().prepareStatement(sqlBuilder.toString());
             preparedStatement.execute();
 
         }catch (SQLException e) {

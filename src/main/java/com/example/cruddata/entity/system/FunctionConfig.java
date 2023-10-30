@@ -12,7 +12,7 @@ public class FunctionConfig extends BasicEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    public Long seq;
     public String functionType;
     public String functionName;
     public String parentId;

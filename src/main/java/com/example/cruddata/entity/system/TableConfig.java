@@ -1,5 +1,6 @@
 package com.example.cruddata.entity.system;
 
+import com.example.cruddata.constant.Status;
 import com.example.cruddata.entity.BasicEntity;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -29,7 +30,7 @@ public class TableConfig extends BasicEntity {
     public String status;
     public void preInsert() {
         super.preInsert();
-        this.status =(this.status == null)  ?"ACTIVE" :this.status;
+        this.status =(this.status == null)  ? Status.ACTIVE :this.status;
     }
 
 }
