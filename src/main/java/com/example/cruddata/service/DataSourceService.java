@@ -17,6 +17,8 @@ public interface DataSourceService {
 
     public List<DataSourceConfig> getAllDataSourceByCondition(Boolean idDelete,String Status,Long tenantId);
 
+    public DataSourceConfig getDataSourceById(Long dataSourceId);
+
     public void resetDataSourceRedisData() throws JsonProcessingException;
 
 

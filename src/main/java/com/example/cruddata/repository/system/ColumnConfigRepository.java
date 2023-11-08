@@ -12,4 +12,6 @@ import java.util.List;
 public interface ColumnConfigRepository extends CrudRepository<ColumnConfig, Long> {
 
     public List<ColumnConfig> findByTenantIdAndIsDeletedAndTableId(Long tenantId , boolean isDeleted, Long tableId);
+
+    public List<ColumnConfig> findByTableIdIn(List<Long> tableList);
 }

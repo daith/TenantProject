@@ -4,7 +4,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.List;
 
 public interface DocumentService {
@@ -14,4 +13,8 @@ public interface DocumentService {
     public ByteArrayOutputStream excelDownloadＶaiTable(Long dataSourceId, String tableName, Long tenantId) throws Exception;
 
     public List<Object> importDataViaFile(Long dataSourceId, String tableName, Long tenantId , MultipartFile file) throws Exception;
+
+    public List<Object> importTablesViaFile(Long dataSourceId,  Long tenantId , MultipartFile file) throws Exception;
+
+    public List<Object> importCodeListViaFile(Long dataSourceId,  Long tenantId , MultipartFile file) throws Exception;
 }

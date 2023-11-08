@@ -12,6 +12,8 @@ public class SelectionValue extends BasicEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
+    public Long tableId;
+
     public String tableName;
 
     public String columnName;
@@ -21,11 +23,13 @@ public class SelectionValue extends BasicEntity {
 
     public String clientColumnKey;
 
-    public String parentColumnName;
+    public String parentTableName;
+
+    public Long parentTableId;
     public String parentColumnKey;
 
-    public Boolean used;
-
     public Long tenantId;
+
+    public Long dataSourceId;
 
 }

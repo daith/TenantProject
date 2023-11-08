@@ -10,6 +10,8 @@ public class RedisKeyConsts {
 
     public static final String SELECTION_VALUE = "selection_value";
 
+    public static final String ACCOUNT = "account";
+
 
 
     public static List<String> getRedisInitKeys(){

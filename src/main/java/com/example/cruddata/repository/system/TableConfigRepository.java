@@ -14,4 +14,7 @@ public interface TableConfigRepository  extends CrudRepository<TableConfig, Long
     @Query("SELECT c FROM TableConfig c WHERE (:isDeleted is null or c.isDeleted = :isDeleted) and (:name is null or c.name = :name) "
             +"and (:tenantId is null or c.tenantId = :tenantId) and (:dataSourceId is null or c.dataSourceId = :dataSourceId)")
     List<TableConfig> findTableConfigByNameAndTenantIdAndIsDeletedAndDataSourceId(String name, Long tenantId , boolean isDeleted,Long dataSourceId);
+
+    @Override
+    List<TableConfig> findAllById(Iterable<Long> tableIds);
 }

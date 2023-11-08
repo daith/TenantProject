@@ -17,9 +17,9 @@ public class TableConfig extends BasicEntity {
     public Long id;
     public String name;
     public String caption;
-    public String description;
-    public Integer displayOrder;
 
+    public String category;
+    public String moduleName;
     public Integer updateById;
     public Integer createById;
 

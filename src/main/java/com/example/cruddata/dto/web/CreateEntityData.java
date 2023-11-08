@@ -9,8 +9,13 @@ public class CreateEntityData {
 
     public String tableName;
 
+    public String moduleName;
+
     public Long datasourceId;
 
     public String caption;
+    public String category;
+
+    public List<String> fkTables;
     public List<ColumnInfoData> columnEntityList;
 }

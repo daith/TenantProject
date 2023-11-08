@@ -15,49 +15,55 @@ import java.util.Optional;
 @Service
 public class SelectionValueServiceImp implements SelectionValueService {
 
+
     @Autowired
     RedisUtil redisUtil;
     @Autowired
     SelectionValueRepository selectionValueRepository;
 
-    public void resetDataSourceRedisData() throws JsonProcessingException{
+    public void resetDataSourceRedisData() throws JsonProcessingException {
         List<SelectionValue> selectionValues = this.selectionValueRepository.findAll();
 
-        for(SelectionValue selectionValue:selectionValues){
-            String data=  selectionValue.getSystemColumnValue();
-            String key = getSelectionRedisKey(selectionValue.getTableName(),selectionValue.getColumnName());
-            if(null == redisUtil.getHashEntries(key)){
-                redisUtil.add(selectionValue.getClientColumnKey(),new HashMap<>());
+        for (SelectionValue selectionValue : selectionValues) {
+            String data = selectionValue.getSystemColumnValue();
+            String key = getSelectionRedisKey(selectionValue.getTableName(), selectionValue.getColumnName());
+            if (null == redisUtil.getHashEntries(key)) {
+                redisUtil.add(selectionValue.getClientColumnKey(), new HashMap<>());
             }
-            redisUtil.add(key,selectionValue.getClientColumnKey(),data);
+            redisUtil.add(key, selectionValue.getClientColumnKey(), data);
         }
 
     }
 
-    private static String getSelectionRedisKey(String tableName , String columnName) {
-        String key =  tableName+"_"+ columnName;
+    private static String getSelectionRedisKey(String tableName, String columnName) {
+        String key = tableName + "_" + columnName;
         return key;
     }
 
     @Override
-    public Object mappingSystemSelectionValue(Long tenantId ,  String tableName, String column, Object clientValue) {
-        String key = getSelectionRedisKey(tableName,column);
+    public Object mappingSystemSelectionValue(Long tenantId, String tableName, String column, Object clientValue) {
+        String key = getSelectionRedisKey(tableName, column);
         Object selectionValue = clientValue;
 
         try {
 
-            if(null != redisUtil.getHashEntries(key) && redisUtil.getHashEntries(key).size() >0){
+            if (null != redisUtil.getHashEntries(key) && redisUtil.getHashEntries(key).size() > 0) {
                 selectionValue = (String) redisUtil.getHashEntries(key).get(clientValue);
-            }else {
+            } else {
                 selectionValue = getValueFromDB(tenantId, tableName, column, clientValue, selectionValue);
             }
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
             selectionValue = getValueFromDB(tenantId, tableName, column, clientValue, selectionValue);
         }
 
 
         return selectionValue;
+    }
+
+    @Override
+    public void saveEntity(SelectionValue selectionValue) {
+        this.selectionValueRepository.save(selectionValue);
     }
 
     private Object getValueFromDB(Long tenantId, String tableName, String column, Object clientValue, Object selectionValue) {

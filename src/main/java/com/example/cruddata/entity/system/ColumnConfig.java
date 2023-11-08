@@ -8,15 +8,6 @@ import lombok.Data;
 
 import java.util.Date;
 
-
-//public String dataType;
-//public String name;
-//public String defaultValue;
-//public Boolean nullable;
-//public Boolean autoIncrement;
-//public String indexType;
-//public String caption;
-//public Integer length;
 @Entity
 @Data
 public class ColumnConfig extends BasicEntity {
@@ -25,7 +16,6 @@ public class ColumnConfig extends BasicEntity {
     public Long id;
     public String name;
     public String caption;
-    public String description;
     public String defaultValue;
 
     public Integer displayOrder;
@@ -38,15 +28,22 @@ public class ColumnConfig extends BasicEntity {
     public String apiParamNaming;
     public String objectNaming;
 
+    public String length;
+
     public Long tenantId;
     public Long tableId;
 
     public String status;
+    public String pkType;
+    public String fkTableName;
+    public String fkColumn;
+
 
 
     public void preInsert() {
         super.preInsert();
         this.status =(this.status == null)  ? Status.ACTIVE :this.status;
+
     }
 
 }

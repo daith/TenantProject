@@ -1,4 +1,5 @@
-INSERT INTO public.${tableName}
+<#ftl output_format="XML">
+INSERT INTO "${tableName}"
 (
 <#list columnNameList as columnName>
   "${columnName.name}" <#if columnName_has_next>,</#if>

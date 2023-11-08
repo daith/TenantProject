@@ -11,24 +11,12 @@ import java.util.List;
 public interface SystemService {
 
 
-    public void deleteColumnConfig(List<ColumnConfig> recordList) throws SQLException;
 
     public void createTable(CreateEntityData createEntity, Long tenantId) throws SQLException;
 
-
-    public void deleteTableConfig(TableConfig recordList);
-
-    public void updateColumnConfig(List<ColumnConfig> recordList);
-
-    public void updateTableConfig(TableConfig recordList);
-
-
-    public List<DataSourceConfig> getDataSourceConfigs(DataSourceConfig dataSourceConfig);
-
-
-    public List<ColumnConfig> getColumnConfigs(TableConfig recordList);
-
     public List<TableConfig> getTableConfigs(Long dataSourceId, String tableName, Long tenantId);
+
+    public void deleteColumnConfig(Long dataSourceId,List<ColumnConfig> recordList) throws SQLException;
 
 
 }

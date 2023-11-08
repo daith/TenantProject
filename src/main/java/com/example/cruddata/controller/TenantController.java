@@ -2,7 +2,7 @@ package com.example.cruddata.controller;
 
 import com.example.cruddata.config.MultiDataSourceManager;
 import com.example.cruddata.dto.business.TenantData;
-import com.example.cruddata.entity.account.Tenant;
+import com.example.cruddata.entity.authroty.Tenant;
 import com.example.cruddata.exception.InvalidDbPropertiesException;
 import com.example.cruddata.exception.LoadDataSourceException;
 import com.example.cruddata.service.TenantService;
@@ -29,22 +29,6 @@ public class TenantController {
     private final TenantService tenantService;
 
 
-    @GetMapping
-    public ResponseEntity<?> getAllTenantByStatus(@RequestParam(name = "idDelete" ,required = false)String idDelete , @RequestParam(name = "status",required = false) String status) {
-        return ResponseEntity.ok(tenantService.getAllTenantByStatus(null == idDelete ? null:Boolean.valueOf(idDelete),status));
-    }
-
-    @PostMapping
-    public ResponseEntity<?> addTenant(@RequestBody TenantData tenantData) {
-        Tenant tenant =new Tenant();
-        tenant.setCompanyName(tenantData.getCompanyName());
-        try {
-            tenantService.addTenant( tenant);
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.ok( e);
-        }
-        return ResponseEntity.ok( tenant);
-    }
 
 
     public ResponseEntity<?> add(@RequestBody Map<String, String> dbProperty) {

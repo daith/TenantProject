@@ -2,14 +2,11 @@ package com.example.cruddata.config;
 
 
 import com.example.cruddata.constant.RedisKeyConsts;
-import com.example.cruddata.entity.account.Tenant;
 import com.example.cruddata.entity.system.DataSourceConfig;
 import com.example.cruddata.exception.TenantNotFoundException;
 import com.example.cruddata.exception.TenantResolvingException;
 import com.example.cruddata.repository.system.DataSourceConfigRepository;
 import com.example.cruddata.util.RedisUtil;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;

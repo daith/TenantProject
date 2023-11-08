@@ -1,7 +1,5 @@
 package com.example.cruddata.repository.system;
 
-import com.example.cruddata.entity.account.Tenant;
-import com.example.cruddata.entity.system.DataSourceConfig;
 import com.example.cruddata.entity.system.SelectionValue;
 import jakarta.transaction.Transactional;
 import org.springframework.data.repository.CrudRepository;

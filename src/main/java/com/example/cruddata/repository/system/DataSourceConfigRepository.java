@@ -1,8 +1,6 @@
 package com.example.cruddata.repository.system;
 
-import com.example.cruddata.entity.account.Tenant;
 import com.example.cruddata.entity.system.DataSourceConfig;
-import com.example.cruddata.entity.system.TableConfig;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

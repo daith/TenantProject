@@ -1,5 +1,8 @@
 package com.example.cruddata.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,5 +27,12 @@ public class CommonUtils {
                         .filter(val -> !list1.contains(val))
                         .collect(Collectors.toList())
                         .isEmpty();
+    }
+
+    public static String objectToJsonStr(Object obj) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        String data=  mapper.writeValueAsString(obj);
+        return data;
+
     }
 }

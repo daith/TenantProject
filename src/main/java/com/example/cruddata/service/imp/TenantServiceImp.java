@@ -2,9 +2,11 @@ package com.example.cruddata.service.imp;
 
 import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.constant.RedisKeyConsts;
-import com.example.cruddata.entity.account.Tenant;
+import com.example.cruddata.constant.Status;
+import com.example.cruddata.entity.authroty.Tenant;
+import com.example.cruddata.entity.system.DataSourceConfig;
 import com.example.cruddata.exception.BusinessException;
-import com.example.cruddata.repository.system.TenantRepository;
+import com.example.cruddata.repository.authroty.TenantRepository;
 import com.example.cruddata.service.TenantService;
 import com.example.cruddata.util.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,6 +16,7 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -52,6 +55,32 @@ public class TenantServiceImp implements TenantService {
     }
 
     @Override
+    public Tenant getTenantById(Long tenantId) {
+        Tenant tenant = null;
+        if(null == redisUtil.getHashEntries(RedisKeyConsts.TENANT)
+                && null != redisUtil.getHashEntries(RedisKeyConsts.TENANT).get(String.valueOf(tenantId))){
+            tenant = (Tenant) redisUtil.getHashEntries(RedisKeyConsts.TENANT).get(String.valueOf(tenantId));
+        } else {
+            tenant = this.tenantRepository.findById(tenantId).get();
+        }
+        return tenant;
+    }
+
+    @Override
+    public Tenant updateTenant(Tenant tenant) {
+
+        if(null != this.getTenantById(tenant.getId())){
+            tenant.setUpdateTime(new Date());
+            this.tenantRepository.save(tenant);
+            if(null == redisUtil.getHashEntries(RedisKeyConsts.TENANT)
+                    && null != redisUtil.getHashEntries(RedisKeyConsts.TENANT).get(String.valueOf(tenant.getId()))){
+                 redisUtil.getHashEntries(RedisKeyConsts.TENANT).put(String.valueOf(tenant.getId()),tenant);
+            }
+        }
+        return tenant;
+    }
+
+    @Override
     public void addTenant(Tenant tenant) throws JsonProcessingException {
         this.tenantRepository.save(tenant);
         ObjectMapper mapper = new ObjectMapper();
@@ -65,6 +94,9 @@ public class TenantServiceImp implements TenantService {
     @Override
     public void resetTenantRedisData() throws JsonProcessingException {
         List<Tenant> tenantList = this.tenantRepository.findAll();
+        if(null != redisUtil.getHashEntries(RedisKeyConsts.TENANT)){
+            redisUtil.delete(RedisKeyConsts.TENANT);
+        }
 
         ObjectMapper mapper = new ObjectMapper();
         for(Tenant tenant:tenantList){

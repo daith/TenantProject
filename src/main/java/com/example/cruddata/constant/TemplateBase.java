@@ -19,4 +19,8 @@ public class TemplateBase {
     public static final String UPDATE_COLUMN_INDEX = "update-column-index.sql.ftl";
     public static final String UPDATE_INDEX = "update-index.sql.ftl";
     public static final String INSERT_DATA = "insert-data.sql.ftl";
+
+    public static final String SELECT_DATA = "select-data.sql.ftl";
+    public static final String DELETE_DATA = "delete-data.sql.ftl";
+
 }

@@ -47,7 +47,6 @@ public class SystemServiceImp implements SystemService {
 
 
 
-    @Override
     /*
     * 1. confirm data 是否存在:
     *   - 所有資料比較完成，比較欄位， ID + tenantId + tableId + isDeleted
@@ -57,7 +56,8 @@ public class SystemServiceImp implements SystemService {
     * 1.1. 若資料，有一筆不存在，整筆資料不進行操作
     * 1.2. 若資料都存在，將存在的資料做刪除
     *  */
-    public void deleteColumnConfig(List<ColumnConfig> recordList) throws SQLException {
+    @Override
+    public void deleteColumnConfig(Long dataSourceId,List<ColumnConfig> recordList) throws SQLException {
         Map<Long,Map<Long,List<ColumnConfig>>> ColumnConfigByTableIdTable = new HashMap<>();
 
         recordList.forEach(item->{
@@ -95,7 +95,7 @@ public class SystemServiceImp implements SystemService {
                 });
                 });
 
-        dataService.dropColumns(dropColumns);
+        dataService.dropColumns(dataSourceId,dropColumns);
         this.columnConfigRepository.saveAll(maintain);
 
 
@@ -154,23 +154,6 @@ public class SystemServiceImp implements SystemService {
 
 
     @Override
-    public void deleteTableConfig(TableConfig recordList) {
-
-    }
-
-    @Override
-    public void updateColumnConfig(List<ColumnConfig> recordList) {
-
-    }
-
-
-
-    @Override
-    public void updateTableConfig(TableConfig recordList) {
-
-    }
-
-    @Override
     public void createTable(CreateEntityData createEntity, Long tenantId) throws SQLException {
         log.info("process createTable start!");
 
@@ -219,17 +202,6 @@ public class SystemServiceImp implements SystemService {
         log.info("process createTable end!");
     }
 
-    @Override
-    public List<DataSourceConfig> getDataSourceConfigs(DataSourceConfig dataSourceConfig) {
-        return null;
-    }
-
-
-
-    @Override
-    public List<ColumnConfig> getColumnConfigs(TableConfig recordList) {
-        return null;
-    }
 
     @Override
     public List<TableConfig> getTableConfigs(Long dataSourceId, String tableName, Long tenantId) {
@@ -241,7 +213,7 @@ public class SystemServiceImp implements SystemService {
         }
 
         List<TableConfig> tables =this.tableConfigRepository.findTableConfigByNameAndTenantIdAndIsDeletedAndDataSourceId(tableName, tenantId,Boolean.FALSE, dataSourceId);
-        if(tables.size() != 1){
+        if(tables.size() != 1 && null != tableName){
             throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "table name  multiple in this datasource",tables);
         }
         return tables;
