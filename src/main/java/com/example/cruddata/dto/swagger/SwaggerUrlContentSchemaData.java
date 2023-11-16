@@ -4,7 +4,7 @@ import lombok.Data;
 
 import java.util.Map;
 @Data
-public class SwaggerUrlResponseData {
+public class SwaggerUrlContentSchemaData {
 
     String description;
     Map<String, Map<String,SwaggerUrlResponseSchemaData>> content;

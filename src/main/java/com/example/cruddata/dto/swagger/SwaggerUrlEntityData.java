@@ -13,7 +13,7 @@ public class SwaggerUrlEntityData {
 
     String description;
     List<Map<String,Object> > parameters;
-    Map<String,?> requestBody;
-    Map<String,SwaggerUrlResponseData> responses;
+    Map<String,Map<String,Map<String,Map<String,String>>>>  requestBody;
+    Map<String, SwaggerUrlContentSchemaData> responses;
 
 }

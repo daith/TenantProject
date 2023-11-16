@@ -197,10 +197,19 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
                     swaggerUrlEntityData.setTags(Arrays.asList(tableConfig.getName()));
                     swaggerUrlEntityData.setResponses(new HashMap<>());
                     if(FunctionType.getActionType(urlAction).equals(FunctionType.CREATE)){
-                        swaggerUrlEntityData.setRequestBody(new HashMap<>());
+
+                        Map<String,Map<String,Map<String,Map<String,String>>>> requestBody  =new HashMap();
+                        requestBody.put("content",new HashMap<>());
+                        requestBody.get("content").put("application/json",new HashMap<>());
+                        requestBody.get("content").get("application/json").put("schema",new HashMap<>());
+                        requestBody.get("content").get("application/json").get("schema").put("$ref","#/components/schemas/"+tableNameKey);
+
+                        swaggerUrlEntityData.setRequestBody(requestBody);
+                        setBasicResponseData(swaggerUrlEntityData);
+
                     } else if (FunctionType.getActionType(urlAction).equals(FunctionType.QUERY)) {
-                        SwaggerUrlResponseData responseData_200  =new SwaggerUrlResponseData();
-                        responseData_200.setDescription("ok");
+                        SwaggerUrlContentSchemaData responseData_200  =new SwaggerUrlContentSchemaData();
+                        responseData_200.setDescription(tableConfig.getCaption());
                         responseData_200.setContent(new HashMap<>());
                         responseData_200.getContent().put("application/json",new HashMap<>());
                         SwaggerUrlResponseSchemaData schemaData = new SwaggerUrlResponseSchemaData();
@@ -208,21 +217,9 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
                         schemaData.setItems(new HashMap<>());
                         schemaData.getItems().put("$ref","#/components/schemas/"+tableNameKey);
                         responseData_200.getContent().get("application/json").put("schema",schemaData);
-                        columnConfigHashMap.get(dataKey);
 
-                        SwaggerUrlResponseData responseData_401  =new SwaggerUrlResponseData();
-                        responseData_401.setDescription("Unauthorized");
-
-                        SwaggerUrlResponseData responseData_403  =new SwaggerUrlResponseData();
-                        responseData_403.setDescription("Forbidden");
-
-                        SwaggerUrlResponseData responseData_404  =new SwaggerUrlResponseData();
-                        responseData_404.setDescription("Not Found");
-
-                        swaggerUrlEntityData.getResponses().put("200",responseData_200);
-                        swaggerUrlEntityData.getResponses().put("401",responseData_401);
-                        swaggerUrlEntityData.getResponses().put("403",responseData_403);
-                        swaggerUrlEntityData.getResponses().put("404",responseData_404);
+                        swaggerUrlEntityData.getResponses().put("200", responseData_200);
+                        setBasicResponseData(swaggerUrlEntityData);
                     }
                     result.get(returnKey).put(urlAction,swaggerUrlEntityData);
 
@@ -235,6 +232,24 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
 
         });
 
+    }
+
+    private static void setBasicResponseData(SwaggerUrlEntityData swaggerUrlEntityData) {
+        SwaggerUrlContentSchemaData responseData_401  =new SwaggerUrlContentSchemaData();
+        responseData_401.setDescription("Unauthorized");
+        SwaggerUrlContentSchemaData responseData_403  =new SwaggerUrlContentSchemaData();
+        responseData_403.setDescription("Forbidden");
+        SwaggerUrlContentSchemaData responseData_404  =new SwaggerUrlContentSchemaData();
+        responseData_404.setDescription("Not Found");
+        swaggerUrlEntityData.getResponses().put("401",responseData_401);
+        swaggerUrlEntityData.getResponses().put("403",responseData_403);
+        swaggerUrlEntityData.getResponses().put("404",responseData_404);
+
+        if(null == swaggerUrlEntityData.getResponses().get("200")){
+            SwaggerUrlContentSchemaData responseData_200  =new SwaggerUrlContentSchemaData();
+            responseData_200.setDescription("OK");
+            swaggerUrlEntityData.getResponses().put("200",responseData_200);
+        }
     }
 
     private void setPathParameter(SwaggerUrlEntityData swaggerUrlEntityData, String moduleName, String tableName) {
