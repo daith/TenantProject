@@ -536,7 +536,7 @@ public class DocumentServiceImp implements DocumentService {
             Boolean tableNotDuplicateInfileCheck = (null != tableName && !createTableEntityDataMap.containsKey(tableName));
             Boolean moduleNameValueCheck  = !(null == moduleName && Boolean.TRUE == SheetConsts.getSheetColumnNullable(sheetName,SheetConsts.SHEET_TABLE_MODULE_NAME));
 
-            if(tableNameValueCheck && categoryValueCheck && tableDescriptionValueCheck && tableNotDuplicateInfileCheck){
+            if(tableNameValueCheck && categoryValueCheck && tableDescriptionValueCheck && tableNotDuplicateInfileCheck && moduleNameValueCheck){
                 CreateEntityData entityData = new CreateEntityData();
                 entityData.setTableName(tableName);
                 entityData.setCategory(category);

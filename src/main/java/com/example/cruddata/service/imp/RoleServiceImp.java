@@ -35,6 +35,7 @@ public class RoleServiceImp implements RoleService {
     public final AccountRoleConfigRepository accountRoleConfigRepository;
 
 
+
     @Override
     public List<RoleFunctionData> getRoleFunctions() {
 
@@ -246,6 +247,27 @@ public class RoleServiceImp implements RoleService {
             throw new BusinessException("createFunction...exception For actionType {}", actionTypes);
         }
 
+    }
+
+    @Override
+    public void saveRoleAccount(Account account, Long roleId) {
+
+        Optional<Role> role = this.roleRepository.findById(roleId);
+        if(role.isPresent()){
+            AccountRole accountRoleInDb = this.accountRoleConfigRepository.findByAccountId(account.getId());
+            if(null == accountRoleInDb){
+                AccountRole accountRole = new AccountRole();
+                accountRole.setAccountId(account.getId());
+                accountRole.setRoleId(roleId);
+                this.accountRoleConfigRepository.save(accountRole);
+            }else {
+                accountRoleInDb.setRoleId(roleId);
+                accountRoleInDb.setUpdateTime(new Date());
+                this.accountRoleConfigRepository.save(accountRoleInDb);
+            }
+        }else {
+            throw new BusinessException("role is not exist {}", roleId);
+        }
     }
 
 }

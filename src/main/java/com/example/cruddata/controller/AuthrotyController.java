@@ -1,18 +1,17 @@
 package com.example.cruddata.controller;
 
 import com.example.cruddata.dto.business.TenantData;
+import com.example.cruddata.dto.web.AccountConditionData;
 import com.example.cruddata.dto.web.AccountData;
-import com.example.cruddata.dto.web.AccountInfoWithRoleData;
 import com.example.cruddata.dto.web.RoleFunctionData;
 import com.example.cruddata.dto.web.RoleFunctionInputData;
 import com.example.cruddata.entity.authroty.Account;
 import com.example.cruddata.entity.authroty.Tenant;
+import com.example.cruddata.exception.BusinessException;
 import com.example.cruddata.service.AccountService;
 import com.example.cruddata.service.RoleService;
 import com.example.cruddata.service.TenantService;
-import com.example.cruddata.util.CommonUtils;
 import com.example.cruddata.util.EncryptUtil;
-import com.example.cruddata.util.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
 
 @Api(tags ="帳號權限 - 新增,修改,刪除")
 @RestController
@@ -35,7 +34,7 @@ public class AuthrotyController {
 
     private final RoleService roleService;
 
-    private final RedisUtil redisUtil;
+
 
     @GetMapping(value="/tenants")
     public ResponseEntity<?> getAllTenantByStatus(@RequestParam(name = "idDelete" ,required = false)String idDelete , @RequestParam(name = "status",required = false) String status) {
@@ -139,37 +138,28 @@ public class AuthrotyController {
     @PostMapping(value="/tenant/{tenantId}/loginAccount")
     public ResponseEntity<?> loginAccount(@PathVariable(name = "tenantId" ,required = true)String tenantId,@RequestBody AccountData accountData) {
         try {
-            AccountInfoWithRoleData accountInfoWithRoleData = new AccountInfoWithRoleData();
-            Account account =new Account();
-            account.setName(accountData.getName());
-            account.setTenantId(Long.valueOf(tenantId));
-            Account accountInDB = this.accountService.getAccountByAccountCondition(account);
-            if(null!=accountInDB && EncryptUtil.getMD5(accountData.getPassword()).equals(accountInDB.getPassword())){
-                RoleFunctionData roleFunctionData =  this.roleService.getRoleFunctionsByAccount( account.getId());
-                StringBuilder tokeData= new StringBuilder();
-                tokeData.append("accountId-").append(account.getId()).append("roleId-").append(roleFunctionData.getRoleId());
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.MONTH, 1);
-                long dateTime = cal.getTimeInMillis();
+            accountData.setTenantId(Long.valueOf(tenantId));
+            return ResponseEntity.ok(this.accountService.getAccountLoginData(accountData));
+        } catch (Exception e) {
+            return ResponseEntity.ok(e);
+        }
+    }
 
-                Map<String ,String > genTokenParameters = new HashMap<>();
-                genTokenParameters.put(EncryptUtil.DATA_VALUE,tokeData.toString());
-                genTokenParameters.put(EncryptUtil.DATA_DATE,String.valueOf(dateTime));
-                genTokenParameters.put(EncryptUtil.DATA_SOAP,EncryptUtil.DATA_SOAP_VALUE);
-                String token = EncryptUtil.genToken(genTokenParameters);
-                accountInDB.setToken(token);
-                accountInDB.setTokenRenewTime(new Date());
-                this.accountService.UpdateAccount(accountInDB);
-                accountInfoWithRoleData.setId(accountInfoWithRoleData.getId());
-                accountInfoWithRoleData.setName(accountInfoWithRoleData.getName());
-                accountInfoWithRoleData.setRoleFunctionData(roleFunctionData);
-                accountInfoWithRoleData.setToken(token);
-                accountInfoWithRoleData.setTenantId(Long.valueOf(tenantId));
-                String data=  CommonUtils.objectToJsonStr(accountInfoWithRoleData);
-                redisUtil.set(token ,data , dateTime);
+    @PostMapping(value="/tenant/{tenantId}/accountRole")
+    public ResponseEntity<?> accountRoleMaintain(@PathVariable(name = "tenantId" ,required = true)String tenantId,@RequestParam("accountName") String accountName,@RequestParam("roleId") String roleId) {
+        try {
+                AccountConditionData account = new AccountConditionData();
+                account.setTenantId(Long.valueOf(tenantId));
+                account.setName(accountName);
+                Account accountInDB = this.accountService.getAccountByAccountCondition(account);
+                if(null==accountInDB){
+                    throw new BusinessException("account no exist {}",account);
+                }
 
-            }
-            return ResponseEntity.ok(accountInfoWithRoleData);
+                this.roleService.saveRoleAccount(accountInDB , Long.valueOf(roleId));
+                RoleFunctionData roleFunctionData =this.roleService.getRoleFunctionsByAccount(accountInDB.getId());
+
+            return ResponseEntity.ok(roleFunctionData);
         } catch (Exception e) {
             return ResponseEntity.ok(e);
         }

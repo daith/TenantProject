@@ -2,6 +2,7 @@ package com.example.cruddata.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpHeaders;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,5 +35,10 @@ public class CommonUtils {
         String data=  mapper.writeValueAsString(obj);
         return data;
 
+    }
+
+    public static String getHeaderToken(HttpHeaders headers){
+        String value  = headers.getFirst(HttpHeaders.AUTHORIZATION);
+        return value.split(" ")[1];
     }
 }

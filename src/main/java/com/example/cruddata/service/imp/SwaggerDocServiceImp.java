@@ -1,5 +1,6 @@
 package com.example.cruddata.service.imp;
 
+import com.example.cruddata.constant.ColumnConsts;
 import com.example.cruddata.constant.FunctionType;
 import com.example.cruddata.dto.swagger.*;
 import com.example.cruddata.entity.authroty.Function;
@@ -17,6 +18,7 @@ import com.example.cruddata.service.SwaggerDocService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import java.io.FileWriter;
@@ -107,9 +109,53 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
         swaggerDocData.setInfo(getSwaggerInfoData());
         swaggerDocData.setServers(getServersData());
         swaggerDocData.setTags(getTagsData(tableConfigHashMap));
-        swaggerDocData.setPaths(getPathInfo(tableConfigHashMap ,  columnConfigHashMap , urlAction));
+        swaggerDocData.setPaths(new HashMap<String, Map<String,SwaggerUrlEntityData>> ());
+        swaggerDocData.setSecurity(new ArrayList<>());
+        setPathInfo(tableConfigHashMap ,  columnConfigHashMap , urlAction,swaggerDocData.getPaths());
+        swaggerDocData.setComponents(new HashMap<>());
+        setSecuritySchemes(swaggerDocData);
+        setSchemas(swaggerDocData.getComponents(),columnConfigHashMap);
+
 
         return swaggerDocData;
+    }
+
+    private void setSchemas(Map<String, Map<String,?>> components, Map<String, List<ColumnConfig>> columnConfigHashMap) {
+        components.put("schemas", new HashMap<String,SwaggerSchemasData>());
+        for (String tableName : columnConfigHashMap.keySet()) {
+            SwaggerSchemasData schemasData = new SwaggerSchemasData();
+            Map<String,SwaggerSchemasData>  entitySetting = (Map<String,SwaggerSchemasData>)  components.get("schemas");
+            entitySetting.put(tableName,schemasData);
+            schemasData.setType("object");
+            schemasData.setProperties( new HashMap<>());
+            List<ColumnConfig> dataList = columnConfigHashMap.get(tableName);
+            dataList.forEach(column->{
+                Map<String,String> columInfo = new HashMap<String,  String>();
+                columInfo.put("type", ColumnConsts.getDataTypeToCode( column.getDataType()));
+                schemasData.getProperties().put(column.getName(),columInfo);
+            });
+        }
+    }
+
+    private void setSecuritySchemes(SwaggerDocData  swaggerDocData) {
+
+        String apiKeyPara = HttpHeaders.AUTHORIZATION;
+        Map<String ,Object > security = new HashMap<>();
+        security.put(apiKeyPara,new ArrayList<>());
+        swaggerDocData.getSecurity().add(security);
+
+
+        HashMap apiKey = new HashMap();
+        apiKey.put("type","http");
+        apiKey.put("scheme","bearer");
+        apiKey.put("bearerFormat","JWT");
+        apiKey.put("description","authentication account key");
+
+        swaggerDocData.getComponents().put("securitySchemes",new HashMap<>());
+        Map<String, Map> entitySetting = (Map<String, Map>) swaggerDocData.getComponents().get("securitySchemes");
+        entitySetting.put(apiKeyPara,apiKey);
+
+
     }
 
     private List<SwaggerTagData> getTagsData(Map<String, TableConfig> tableConfigHashMap) {
@@ -124,8 +170,9 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
         return tags;
     }
 
-    private Map<String, Map<String, SwaggerUrlEntityData>> getPathInfo(Map<String, TableConfig> tableConfigHashMap, Map<String, List<ColumnConfig>> columnConfigHashMap, Map<String, List<Function>> urlActions) {
-        Map<String, Map<String,SwaggerUrlEntityData>> result = new HashMap<>();
+    private void setPathInfo(Map<String, TableConfig> tableConfigHashMap, Map<String, List<ColumnConfig>> columnConfigHashMap,
+                                                                       Map<String, List<Function>> urlActions,Map<String, Map<String,SwaggerUrlEntityData>> paths) {
+        Map<String, Map<String,SwaggerUrlEntityData>> result = paths;
 
         tableConfigHashMap.forEach((tableNameKey , tableConfig)->{
             String moduleName = tableConfig.getModuleName();
@@ -133,19 +180,50 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
             String returnKey ="/api/v1/"+moduleName+"/"+tableConfig.getName();
             result.put(returnKey,new HashMap<>());
 
+            String finalModuleName = moduleName;
             urlActions.get(tableNameKey).forEach(function -> {
                 String urlAction = FunctionType.getUrlAction(function.getFunctionType());
                 if(null != urlAction){
+                    String dataKey = tableConfig.getName() +"-" +urlAction;
                     SwaggerUrlEntityData swaggerUrlEntityData = new SwaggerUrlEntityData();
-                    swaggerUrlEntityData.setSummary(tableConfig.getName() +"-" +urlAction );
+                    setPathParameter(swaggerUrlEntityData, finalModuleName, tableConfig.getName());
+                    swaggerUrlEntityData.setParameters(new ArrayList<>());
+                    swaggerUrlEntityData.setRequestBody(new HashMap<>());
+
+                    swaggerUrlEntityData.setSummary(dataKey );
                     swaggerUrlEntityData.setOperationId(tableConfig.getName() +"-" +urlAction);
                     swaggerUrlEntityData.setDescription(function.getDescription());
                     swaggerUrlEntityData.setSummary(function.getDescription());
                     swaggerUrlEntityData.setTags(Arrays.asList(tableConfig.getName()));
-                    if(urlAction.equals(FunctionType.CREATE.toString())){
-                        swaggerUrlEntityData.setRequestBody(new HashMap<>());
-                    }
                     swaggerUrlEntityData.setResponses(new HashMap<>());
+                    if(FunctionType.getActionType(urlAction).equals(FunctionType.CREATE)){
+                        swaggerUrlEntityData.setRequestBody(new HashMap<>());
+                    } else if (FunctionType.getActionType(urlAction).equals(FunctionType.QUERY)) {
+                        SwaggerUrlResponseData responseData_200  =new SwaggerUrlResponseData();
+                        responseData_200.setDescription("ok");
+                        responseData_200.setContent(new HashMap<>());
+                        responseData_200.getContent().put("application/json",new HashMap<>());
+                        SwaggerUrlResponseSchemaData schemaData = new SwaggerUrlResponseSchemaData();
+                        schemaData.setType("array");
+                        schemaData.setItems(new HashMap<>());
+                        schemaData.getItems().put("$ref","#/components/schemas/"+tableNameKey);
+                        responseData_200.getContent().get("application/json").put("schema",schemaData);
+                        columnConfigHashMap.get(dataKey);
+
+                        SwaggerUrlResponseData responseData_401  =new SwaggerUrlResponseData();
+                        responseData_401.setDescription("Unauthorized");
+
+                        SwaggerUrlResponseData responseData_403  =new SwaggerUrlResponseData();
+                        responseData_403.setDescription("Forbidden");
+
+                        SwaggerUrlResponseData responseData_404  =new SwaggerUrlResponseData();
+                        responseData_404.setDescription("Not Found");
+
+                        swaggerUrlEntityData.getResponses().put("200",responseData_200);
+                        swaggerUrlEntityData.getResponses().put("401",responseData_401);
+                        swaggerUrlEntityData.getResponses().put("403",responseData_403);
+                        swaggerUrlEntityData.getResponses().put("404",responseData_404);
+                    }
                     result.get(returnKey).put(urlAction,swaggerUrlEntityData);
 
                 }
@@ -157,14 +235,41 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
 
         });
 
-        return result;
+    }
+
+    private void setPathParameter(SwaggerUrlEntityData swaggerUrlEntityData, String moduleName, String tableName) {
+        if(null == swaggerUrlEntityData.getParameters()){
+            swaggerUrlEntityData.setParameters(new ArrayList<>());
+        }
+
+
+            Map<String ,Object> moduleNameParameter = new HashMap<>();
+            Map<String ,String> schemaPara = new HashMap<>();
+            schemaPara.put("type","string");
+            moduleNameParameter.put("name",moduleName);
+            moduleNameParameter.put("in","path");
+            moduleNameParameter.put("required",Boolean.TRUE);
+            moduleNameParameter.put("default",moduleName);
+            moduleNameParameter.put("schema",schemaPara);
+
+            swaggerUrlEntityData.getParameters().add(moduleNameParameter);
+
+            Map<String ,Object> tableNameParameter = new HashMap<>();
+            tableNameParameter.put("name",tableName);
+            tableNameParameter.put("in","path");
+            tableNameParameter.put("required",Boolean.TRUE);
+            tableNameParameter.put("default",tableName);
+            tableNameParameter.put("schema",schemaPara);
+
+            swaggerUrlEntityData.getParameters().add(tableNameParameter);
     }
 
     private List<SwaggerServerData> getServersData() {
         List<SwaggerServerData> serverDataList= new ArrayList<>();
         SwaggerServerData swaggerServerData = new SwaggerServerData();
-        swaggerServerData.setUrl("http://localhost:8888/");
+        swaggerServerData.setUrl("http://localhost:8888");
         swaggerServerData.setDescription("demo for test");
+        serverDataList.add(swaggerServerData);
         return serverDataList;
     }
 

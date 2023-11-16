@@ -63,6 +63,7 @@ CREATE TABLE `table_config` (
                                 `name` VARCHAR(255) ,
                                 `category` VARCHAR(255) DEFAULT '',
                                 `caption` VARCHAR(255) DEFAULT '',
+                                `module_name` VARCHAR(255) DEFAULT '',
                                 `display_order` INTEGER DEFAULT 0,
                                 `create_time` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime')),
                                 `update_time` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime')),

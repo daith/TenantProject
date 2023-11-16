@@ -9,9 +9,11 @@ import java.util.Map;
 public class SwaggerDocData {
     String openapi;
     SwaggerInfoData info;
+
+    List<Map<String,Object>>  security;
     List<SwaggerServerData> servers;
     List<SwaggerTagData>  tags;
     Map<String, Map<String,SwaggerUrlEntityData>> paths;
 
-    Map<String, Map<String,SwaggerUrlEntityData>> components;
+    Map<String, Map<String,?>> components;
 }

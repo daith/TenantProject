@@ -1,6 +1,9 @@
 package com.example.cruddata.service;
 
+import com.example.cruddata.dto.web.AccountConditionData;
+import com.example.cruddata.dto.web.AccountData;
 import com.example.cruddata.entity.authroty.Account;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.List;
 
@@ -12,5 +15,9 @@ public interface AccountService {
 
     public Account UpdateAccount(Account account);
 
-    public Account getAccountByAccountCondition(Account account);
+    public Account getAccountByAccountCondition(AccountConditionData account);
+
+    public String getAccountLoginData(AccountData account) throws JsonProcessingException;
+
+    public Boolean tokenValidationNotExist(String token) throws JsonProcessingException;
 }

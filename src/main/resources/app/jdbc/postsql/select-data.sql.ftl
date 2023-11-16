@@ -8,7 +8,7 @@ Select
 </#if>
 From "${tableName}"
 Where  1=1
-<#if (conditionForEq?size = 1)>
+<#if (conditionForEq?? && columnSelectedList?size != 0)>
     <#list conditionForEq?keys as prop>
         "${prop}" = '${conditionForEq[prop]}'
         <#if prop_has_next> and </#if>

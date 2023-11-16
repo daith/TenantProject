@@ -1,7 +1,6 @@
 package com.example.cruddata;
 
 import com.example.cruddata.config.MultiDataSourceManager;
-import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -18,10 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.util.Properties;
-
-import static java.lang.String.format;
 
 @ComponentScan({"com.example", "com.example.cruddata"})
 @ServletComponentScan(basePackages = {"com.example"})
@@ -33,6 +29,8 @@ public class CrudDataApplication {
     private final MultiDataSourceManager multiDataSourceManager;
 
     private static final Logger log = LoggerFactory.getLogger(CrudDataApplication.class);
+
+
 
 
     public CrudDataApplication(MultiDataSourceManager multiDataSourceManager) {
@@ -95,5 +93,7 @@ public class CrudDataApplication {
     public static void main(String[] args) {
         SpringApplication.run(CrudDataApplication.class, args);
     }
+
+
 
 }

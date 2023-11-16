@@ -12,7 +12,7 @@ public class SwaggerUrlEntityData {
     String operationId;
 
     String description;
-    List<SwaggerUrlParameterData> parameters;
+    List<Map<String,Object> > parameters;
     Map<String,?> requestBody;
     Map<String,SwaggerUrlResponseData> responses;
 

@@ -45,4 +45,14 @@ public class ColumnConsts {
 
     public static final String DATA_TYPE_TEXT = "TEXT";
 
+    public static String getDataTypeToCode(String dataType){
+        if(dataType.equals(DATA_TYPE_INT)||dataType.equals(DATA_TYPE_BIGINT)){
+            return "integer";
+        }else if(dataType.equals(DATA_TYPE_BOOL)){
+            return "boolean";
+        } else{
+            return "string";
+        }
+    }
+
 }

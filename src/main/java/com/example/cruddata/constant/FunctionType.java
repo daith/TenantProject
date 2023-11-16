@@ -33,4 +33,19 @@ public enum FunctionType {
             return null;
         }
     }
+
+    public static FunctionType  getActionType(String action){
+
+        if(action.equals("post")){
+            return UPDATE;
+        }else if(action.equals("put")){
+            return CREATE;
+        }else if(action.equals("delete")) {
+            return DELETE;
+        }else if(action.equals("get")){
+            return QUERY;
+        }else {
+            return null;
+        }
+    }
 }
