@@ -7,6 +7,10 @@ import java.util.Map;
 
 @Data
 public class UpdateEntityData {
-    public Integer totalRecordCount;
-    public List<Map> recordList;
+
+    public String tableName;
+    public List<String> keyColumns;
+    public List<String> dataColumns;
+
+    public List<Map<String,Object>> recordList;
 }

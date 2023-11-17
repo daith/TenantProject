@@ -114,8 +114,6 @@ public class FileController {
 
         try {
             List<Object> result = documentService.importCodeListViaFile( Long.valueOf(dataSourceId), Long.valueOf(tenantId) , file);
-
-
             return ResponseEntity.ok(result);
 
 
@@ -126,16 +124,9 @@ public class FileController {
 
     @PostMapping(value="roleJsonFile/{roleId}")
     public ResponseEntity<?> roleJsonFile( @RequestParam("roleId") String roleId ) {
-
-
-
         try {
             swaggerDocService.genSwaggerDoc(Long.valueOf(roleId));
-
-
             return ResponseEntity.ok(roleId);
-
-
         } catch (Exception e) {
             return ResponseEntity.ok(e);
         }

@@ -123,17 +123,28 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
     private void setSchemas(Map<String, Map<String,?>> components, Map<String, List<ColumnConfig>> columnConfigHashMap) {
         components.put("schemas", new HashMap<String,SwaggerSchemasData>());
         for (String tableName : columnConfigHashMap.keySet()) {
+            // Basic
             SwaggerSchemasData schemasData = new SwaggerSchemasData();
             Map<String,SwaggerSchemasData>  entitySetting = (Map<String,SwaggerSchemasData>)  components.get("schemas");
             entitySetting.put(tableName,schemasData);
             schemasData.setType("object");
             schemasData.setProperties( new HashMap<>());
+            schemasData.setItems( new HashMap<>());
             List<ColumnConfig> dataList = columnConfigHashMap.get(tableName);
             dataList.forEach(column->{
                 Map<String,String> columInfo = new HashMap<String,  String>();
                 columInfo.put("type", ColumnConsts.getDataTypeToCode( column.getDataType()));
                 schemasData.getProperties().put(column.getName(),columInfo);
             });
+
+            // List
+            SwaggerSchemasData schemasListData = new SwaggerSchemasData();
+            entitySetting.put(tableName+"-list",schemasListData);
+            schemasListData.setProperties( new HashMap<>());
+            schemasListData.setType("array");
+            Map listItem = new HashMap();
+            listItem.put("$ref","#/components/schemas/"+tableName);
+            schemasListData.setItems(listItem);
         }
     }
 
@@ -198,14 +209,7 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
                     swaggerUrlEntityData.setResponses(new HashMap<>());
                     if(FunctionType.getActionType(urlAction).equals(FunctionType.CREATE)){
 
-                        Map<String,Map<String,Map<String,Map<String,String>>>> requestBody  =new HashMap();
-                        requestBody.put("content",new HashMap<>());
-                        requestBody.get("content").put("application/json",new HashMap<>());
-                        requestBody.get("content").get("application/json").put("schema",new HashMap<>());
-                        requestBody.get("content").get("application/json").get("schema").put("$ref","#/components/schemas/"+tableNameKey);
-
-                        swaggerUrlEntityData.setRequestBody(requestBody);
-                        setBasicResponseData(swaggerUrlEntityData);
+                        setCreateParameterProcess(tableNameKey, swaggerUrlEntityData);
 
                     } else if (FunctionType.getActionType(urlAction).equals(FunctionType.QUERY)) {
                         SwaggerUrlContentSchemaData responseData_200  =new SwaggerUrlContentSchemaData();
@@ -220,18 +224,36 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
 
                         swaggerUrlEntityData.getResponses().put("200", responseData_200);
                         setBasicResponseData(swaggerUrlEntityData);
+                    }else if (FunctionType.getActionType(urlAction).equals(FunctionType.DELETE)) {
+                        setDeleteParameterProcess(tableNameKey, swaggerUrlEntityData);
+                    }else if (FunctionType.getActionType(urlAction).equals(FunctionType.UPDATE)) {
+                        setUpdateParameterProcess(tableNameKey, swaggerUrlEntityData);
                     }
                     result.get(returnKey).put(urlAction,swaggerUrlEntityData);
 
                 }
-
             });
-
-
-
 
         });
 
+    }
+
+    private static void setUpdateParameterProcess(String tableNameKey, SwaggerUrlEntityData swaggerUrlEntityData){
+        setCreateParameterProcess(tableNameKey, swaggerUrlEntityData);
+    }
+
+    private static void setDeleteParameterProcess(String tableNameKey, SwaggerUrlEntityData swaggerUrlEntityData){
+        setCreateParameterProcess(tableNameKey, swaggerUrlEntityData);
+    }
+    private static void setCreateParameterProcess(String tableNameKey, SwaggerUrlEntityData swaggerUrlEntityData) {
+        Map<String,Map<String,Map<String,Map<String,String>>>> requestBody  =new HashMap();
+        requestBody.put("content",new HashMap<>());
+        requestBody.get("content").put("application/json",new HashMap<>());
+        requestBody.get("content").get("application/json").put("schema",new HashMap<>());
+        requestBody.get("content").get("application/json").get("schema").put("$ref","#/components/schemas/"+ tableNameKey+"-list");
+
+        swaggerUrlEntityData.setRequestBody(requestBody);
+        setBasicResponseData(swaggerUrlEntityData);
     }
 
     private static void setBasicResponseData(SwaggerUrlEntityData swaggerUrlEntityData) {

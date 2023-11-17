@@ -23,4 +23,6 @@ public class TemplateBase {
     public static final String SELECT_DATA = "select-data.sql.ftl";
     public static final String DELETE_DATA = "delete-data.sql.ftl";
 
+    public static final String UPDATE_DATA = "update-data.sql.ftl";
+
 }

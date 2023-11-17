@@ -1,9 +1,9 @@
 <#ftl output_format="XML">
 DELETE FROM "${tableName}"
 Where  1=1
-<#if (records?size != 0)>
+<#if (recordList?size != 0)>
     and
-     <#list records as record>
+     <#list recordList as record>
          (
          <#list record?keys as prop>
              "${prop}" = '${record[prop]}'

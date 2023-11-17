@@ -1,9 +1,6 @@
 package com.example.cruddata.service;
 
-import com.example.cruddata.dto.web.CreateEntityData;
-import com.example.cruddata.dto.web.DeleteEntityData;
-import com.example.cruddata.dto.web.InsertEntityData;
-import com.example.cruddata.dto.web.SampleSelectionEntityData;
+import com.example.cruddata.dto.web.*;
 import com.example.cruddata.entity.system.ColumnConfig;
 
 import java.sql.SQLException;
@@ -24,5 +21,7 @@ public interface DataService {
     List<Map<String,Object>> queryDataBySampleCondition(Long dataSourceId , String dbName  , SampleSelectionEntityData entityData) throws SQLException;
 
     void deleteData(Long dataSourceId , String dbName  , DeleteEntityData records) throws SQLException;
+
+    void UpdateData(Long dataSourceId , String dbName  , UpdateEntityData records) throws SQLException;
 
 }

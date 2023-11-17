@@ -10,5 +10,8 @@ public interface DynamicService {
 
     public List<?> getAllDataFromTable(Function function) throws SQLException;
 
-    public List<?> getDataImport(Function function,List<Map<String,Object>> dataImport) throws SQLException ;
+    public List<?> createDataList(Function function, List<Map<String,Object>> dataImport) throws SQLException ;
+
+    public List<?> deleteDataList(Function function, List<Map<String,Object>> dataImport) throws SQLException;
+    public List<?> updateDataList(Function function, List<Map<String,Object>> dataImport) throws SQLException;
 }

@@ -10,5 +10,5 @@ public class DeleteEntityData {
 
     public String tableName;
 
-    List<Map<String,Object>> records;
+    List<Map<String,Object>> recordList;
 }

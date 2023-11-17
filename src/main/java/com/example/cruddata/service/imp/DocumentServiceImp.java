@@ -296,7 +296,7 @@ public class DocumentServiceImp implements DocumentService {
                 if(result.size()>0){
                     DeleteEntityData deleteEntityData = new DeleteEntityData();
                     deleteEntityData.setTableName(table);
-                    deleteEntityData.setRecords(result);
+                    deleteEntityData.setRecordList(result);
                     this.dataService.deleteData(dataSourceId,dataSourceConfig.get().getDatabaseType(),deleteEntityData);
                 }
                 this.dataService.insertData(dataSourceId,dataSourceConfig.get().getDatabaseType(),entity);

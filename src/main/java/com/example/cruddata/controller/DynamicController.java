@@ -55,7 +55,7 @@ public class DynamicController {
     }
 
     @PutMapping("{modelName}/{tableName}")
-    public ResponseEntity<?> getMaintainDynamicData(@RequestHeader HttpHeaders headers, @PathVariable(value = "modelName") String modelName , @PathVariable(value = "tableName") String tableName ,@RequestBody List<Map<String,Object>>  dynamicEntityData ) throws SQLException {
+    public ResponseEntity<?> createDynamicData(@RequestHeader HttpHeaders headers, @PathVariable(value = "modelName") String modelName , @PathVariable(value = "tableName") String tableName ,@RequestBody List<Map<String,Object>>  dynamicEntityData ) throws SQLException {
         log.info(dynamicEntityData.toString());
         String token = CommonUtils.getHeaderToken(headers);
 
@@ -74,7 +74,53 @@ public class DynamicController {
         }
 
 
-        return ResponseEntity.ok( dynamicService.getDataImport(function ,dynamicEntityData ));
+        return ResponseEntity.ok( dynamicService.createDataList(function ,dynamicEntityData ));
+    }
+
+    @DeleteMapping("{modelName}/{tableName}")
+    public ResponseEntity<?> deleteDynamicData(@RequestHeader HttpHeaders headers, @PathVariable(value = "modelName") String modelName , @PathVariable(value = "tableName") String tableName ,@RequestBody List<Map<String,Object>>  dynamicEntityData ) throws SQLException {
+        log.info(dynamicEntityData.toString());
+        String token = CommonUtils.getHeaderToken(headers);
+
+        if (null == redisUtil.getHashEntries(token)) {
+            throw new BusinessException("token not correct.");
+        }
+
+        RoleFunctionData roleFunction = (RoleFunctionData) redisUtil.getHashEntries(token).get("roleFunction");
+        Map<String , Function> functionMap = roleFunction.getFunctionActions().get(tableName);
+        if(null == functionMap){
+            throw new BusinessException("you cant use this table.");
+        }
+        Function function = functionMap.get(FunctionType.QUERY.toString());
+        if(null == function){
+            throw new BusinessException("you cant use this table query.");
+        }
+
+
+        return ResponseEntity.ok( dynamicService.deleteDataList(function ,dynamicEntityData ));
+    }
+
+    @PostMapping("{modelName}/{tableName}")
+    public ResponseEntity<?> maitainDynamicData(@RequestHeader HttpHeaders headers, @PathVariable(value = "modelName") String modelName , @PathVariable(value = "tableName") String tableName ,@RequestBody List<Map<String,Object>>  dynamicEntityData ) throws SQLException {
+        log.info(dynamicEntityData.toString());
+        String token = CommonUtils.getHeaderToken(headers);
+
+        if (null == redisUtil.getHashEntries(token)) {
+            throw new BusinessException("token not correct.");
+        }
+
+        RoleFunctionData roleFunction = (RoleFunctionData) redisUtil.getHashEntries(token).get("roleFunction");
+        Map<String , Function> functionMap = roleFunction.getFunctionActions().get(tableName);
+        if(null == functionMap){
+            throw new BusinessException("you cant use this table.");
+        }
+        Function function = functionMap.get(FunctionType.QUERY.toString());
+        if(null == function){
+            throw new BusinessException("you cant use this table query.");
+        }
+
+
+        return ResponseEntity.ok( dynamicService.updateDataList(function ,dynamicEntityData ));
     }
 
 }

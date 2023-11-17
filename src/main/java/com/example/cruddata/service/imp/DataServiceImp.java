@@ -4,10 +4,7 @@ import com.example.cruddata.config.MultiDataSourceManager;
 import com.example.cruddata.constant.DataSourceInfo;
 import com.example.cruddata.constant.TemplateBase;
 import com.example.cruddata.controller.TableController;
-import com.example.cruddata.dto.web.CreateEntityData;
-import com.example.cruddata.dto.web.DeleteEntityData;
-import com.example.cruddata.dto.web.InsertEntityData;
-import com.example.cruddata.dto.web.SampleSelectionEntityData;
+import com.example.cruddata.dto.web.*;
 import com.example.cruddata.entity.system.ColumnConfig;
 import com.example.cruddata.service.DataService;
 import com.example.cruddata.util.TemplateParse;
@@ -165,7 +162,6 @@ public class DataServiceImp implements DataService {
             columnConfigsByTableName.forEach((tableName, columns)->{
                 columns.forEach(column ->{
                     String sql =  templateParse.processTemplateToString(tableName, TemplateBase.DROP_COLUMN, column);
-                    log.info("[i] Build SQL'{}' from template '{}'.", sql , TemplateBase.CREATE_TABLE);
                     sqlBuilder.append(sql);
 
                 });
@@ -212,7 +208,7 @@ public class DataServiceImp implements DataService {
 
                 connection = multiDataSourceManager.dataSource().getConnection();
                 String sql =  templateParse.processTemplateToString(dbName , TemplateBase.SELECT_DATA, entityData);
-                log.info("[i] Build SQL'{}' from template '{}'.", sql , TemplateBase.INSERT_DATA);
+                log.info("[i] Build SQL'{}' from template '{}'.", sql , TemplateBase.SELECT_DATA);
                 preparedStatement = connection.prepareStatement(sql);
                 ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -258,11 +254,48 @@ public class DataServiceImp implements DataService {
         Connection connection = null;
 
         try{
-
+            DataSourceInfo.setTenant(this.multiDataSourceManager,String.valueOf(dataSourceId));
 
             connection = multiDataSourceManager.dataSource().getConnection();
             String sql =  templateParse.processTemplateToString(dbName , TemplateBase.DELETE_DATA, records);
             log.info("[i] Build SQL'{}' from template '{}'.", sql , TemplateBase.DELETE_DATA);
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.execute();
+
+        }catch (SQLException e) {
+            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            throw new SQLException(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            if(null != preparedStatement){
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) { /* Ignored */
+                }
+
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) { /* Ignored */
+                }
+            }
+        }
+    }
+
+    @Override
+    public void UpdateData(Long dataSourceId, String dbName, UpdateEntityData records) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        Connection connection = null;
+
+        try{
+            DataSourceInfo.setTenant(this.multiDataSourceManager,String.valueOf(dataSourceId));
+
+            connection = multiDataSourceManager.dataSource().getConnection();
+            String sql =  templateParse.processTemplateToString(dbName , TemplateBase.UPDATE_DATA, records);
+            log.info("[i] Build SQL'{}' from template '{}'.", sql , TemplateBase.UPDATE_DATA);
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.execute();
 

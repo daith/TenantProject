@@ -9,4 +9,5 @@ import java.util.Map;
 public class SwaggerSchemasData {
     String type;
     Map<String, Map<String,String>> properties;
+    Map<String, String> items;
 }
