@@ -14,9 +14,8 @@ public class ApiErrorCode {
 
     public static final String COLUMNS_OF_TABLE_DELETE_NOT_CLEAR = "COLUMNS_OF_TABLE_DELETE_NOT_CLEAR";
 
-
+    public static final String MAINTAIN_FAIL = "MAINTAIN_FAIL";
     public static final String API_RESOURCE_NOT_FOUND = "API_RESOURCE_NOT_FOUND";
-    public static final String AUTH_UNAUTHORIZED = "UNAUTHORIZED";
     public static final String AUTH_FORBIDDEN = "FORBIDDEN";
     public static final String AUTH_ERROR = "AUTH_ERROR";
 
@@ -26,9 +25,6 @@ public class ApiErrorCode {
         switch (code) {
             case API_RESOURCE_NOT_FOUND:
                 httpStatus = HttpStatus.NOT_FOUND;
-                break;
-            case AUTH_UNAUTHORIZED:
-                httpStatus = HttpStatus.UNAUTHORIZED;
                 break;
             case AUTH_FORBIDDEN:
                 httpStatus = HttpStatus.FORBIDDEN;
@@ -44,7 +40,4 @@ public class ApiErrorCode {
         return code;
     }
 
-    private ApiErrorCode() {
-
-    }
 }

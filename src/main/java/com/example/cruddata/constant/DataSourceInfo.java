@@ -2,7 +2,7 @@ package com.example.cruddata.constant;
 
 import com.example.cruddata.config.MultiDataSourceManager;
 import com.example.cruddata.exception.InvalidDbPropertiesException;
-import com.example.cruddata.exception.InvalidTenantIdExeption;
+import com.example.cruddata.exception.InvalidTenantIdException;
 import com.example.cruddata.exception.TenantNotFoundException;
 import com.example.cruddata.exception.TenantResolvingException;
 import org.slf4j.Logger;
@@ -26,10 +26,10 @@ public class DataSourceInfo {
             throw new InvalidDbPropertiesException();
         } catch (TenantNotFoundException e) {
             log.error(MSG_INVALID_TENANT_ID, dataSourceId);
-            throw new InvalidTenantIdExeption();
+            throw new InvalidTenantIdException();
         } catch (TenantResolvingException e) {
             log.error(MSG_RESOLVING_TENANT_ID, dataSourceId);
-            throw new InvalidTenantIdExeption();
+            throw new InvalidTenantIdException();
         }
     }
 }

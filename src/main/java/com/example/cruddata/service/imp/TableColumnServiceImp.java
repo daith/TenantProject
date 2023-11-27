@@ -1,5 +1,6 @@
 package com.example.cruddata.service.imp;
 
+import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.constant.Status;
 import com.example.cruddata.dto.web.RoleFunctionData;
 import com.example.cruddata.entity.authroty.RoleFunction;
@@ -7,6 +8,7 @@ import com.example.cruddata.entity.system.ColumnConfig;
 import com.example.cruddata.entity.system.DataSourceConfig;
 import com.example.cruddata.entity.system.TableConfig;
 import com.example.cruddata.exception.BusinessException;
+import com.example.cruddata.exception.InvalidDbPropertiesException;
 import com.example.cruddata.repository.system.ColumnConfigRepository;
 import com.example.cruddata.repository.system.TableConfigRepository;
 import com.example.cruddata.service.DataService;
@@ -70,7 +72,7 @@ public class TableColumnServiceImp implements TableColumnService{
             List<RoleFunction>  roleFunctions =  this.roleService.getRoleFunctionsByTenantIdAndNameAndDataSource(tenantId ,tableName , dataSourceId );
 
             if(roleFunctions.size()>0){
-                throw new BusinessException("table set role auth {}!",roleFunctions);
+                throw new BusinessException(ApiErrorCode.AUTH_ERROR,"table set role auth {}!",roleFunctions);
             }
 
             DataSourceConfig dataSourceConfig = dataSourceService.getDataSourceById(dataSourceId);
@@ -79,7 +81,7 @@ public class TableColumnServiceImp implements TableColumnService{
             }
 
         }else{
-            throw new BusinessException("table-{}/- in db data is not correct!",tableConfig);
+            throw new BusinessException(ApiErrorCode.SQL_ERROR,"table-{}/- in db data is not correct!",tableConfig);
         }
     }
 
@@ -116,7 +118,7 @@ public class TableColumnServiceImp implements TableColumnService{
             List<RoleFunctionData> roles = roleService.getRoleFunctionsByTenantId( tenantId);
             roles.forEach(roleData->{
                 if(roleData.getFunctionActions().size() >0){
-                    throw new BusinessException("Pleaser remove All Role function auth setting");
+                    throw new BusinessException(ApiErrorCode.AUTH_ERROR,"Pleaser remove All Role function auth setting");
                 }
             });
 
@@ -139,7 +141,7 @@ public class TableColumnServiceImp implements TableColumnService{
                 executeProcess+=1;
             }
         }else {
-            throw new BusinessException("the datasource info not found correct object tenantId-{} ,dataSourceId- {}" , tenantId ,dataSourceId );
+            throw new InvalidDbPropertiesException();
         }
 
 

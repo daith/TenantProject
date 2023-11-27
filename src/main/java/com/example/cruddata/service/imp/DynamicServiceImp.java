@@ -1,5 +1,6 @@
 package com.example.cruddata.service.imp;
 
+import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.dto.web.DeleteEntityData;
 import com.example.cruddata.dto.web.InsertEntityData;
 import com.example.cruddata.dto.web.SampleSelectionEntityData;
@@ -41,7 +42,7 @@ public class DynamicServiceImp implements DynamicService {
                 .map(ColumnConfig ::getName )
                 .collect(Collectors.toList());
         if(columnConfigs.size() ==0) {
-            throw new BusinessException("table not set column , Please confirm with admin");
+            throw new BusinessException(ApiErrorCode.SQL_ERROR,"table not set column , Please confirm with admin");
         }
         SampleSelectionEntityData entityData =new SampleSelectionEntityData();
         entityData.setTableName(function.getFunctionName());
@@ -58,7 +59,7 @@ public class DynamicServiceImp implements DynamicService {
         List<ColumnConfig> columnConfigs = columnConfigRepository.findByTableIdIn((Arrays.asList(function.getTableId())));
 
         if(columnConfigs.size() ==0) {
-            throw new BusinessException("table not set column , Please confirm with admin");
+            throw new BusinessException(ApiErrorCode.SQL_ERROR,"table not set column , Please confirm with admin");
         }
         InsertEntityData insertEntityData = new InsertEntityData();
         insertEntityData.setColumnNameList(columnConfigs);
@@ -78,7 +79,7 @@ public class DynamicServiceImp implements DynamicService {
 
 
         if(columnConfigs.size() ==0) {
-            throw new BusinessException("table not set column , Please confirm with admin");
+            throw new BusinessException(ApiErrorCode.SQL_ERROR,"table not set column , Please confirm with admin");
         }
         DeleteEntityData deleteEntityData = new DeleteEntityData();
         deleteEntityData.setTableName(function.getFunctionName());
@@ -96,7 +97,7 @@ public class DynamicServiceImp implements DynamicService {
         List<ColumnConfig> columnConfigs = columnConfigRepository.findByTableIdIn((Arrays.asList(function.getTableId())));
 
         if(columnConfigs.size() ==0) {
-            throw new BusinessException("table not set column , Please confirm with admin");
+            throw new BusinessException(ApiErrorCode.SQL_ERROR,"table not set column , Please confirm with admin");
         }
 
         List<String> keyColumns = columnConfigs.stream().filter(item ->

@@ -386,7 +386,7 @@ public class DocumentServiceImp implements DocumentService {
         });
 
         if( 0!= dataError.keySet().size()){
-            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , dataError);
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR, "data error" , dataError);
         }
     }
 
@@ -455,7 +455,7 @@ public class DocumentServiceImp implements DocumentService {
         });
 
         if( 0!= dataError.keySet().size()){
-            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , dataError);
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR,"dataError" , dataError);
         }
     }
 

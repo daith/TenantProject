@@ -7,8 +7,10 @@ import com.example.cruddata.entity.authroty.Account;
 import com.example.cruddata.entity.authroty.Function;
 import com.example.cruddata.entity.authroty.Role;
 import com.example.cruddata.entity.authroty.RoleFunction;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.List;
+import java.util.Map;
 
 public interface RoleService {
 
@@ -22,7 +24,7 @@ public interface RoleService {
 
     public RoleFunctionData getRoleFunctionsByRoleId(Long roleId);
 
-    public RoleFunctionData saveRoleFunctions(RoleFunctionInputData roleFunctionData, Long tenantId  , Long dataSourceId);
+    public Map<String,Object> saveRoleFunctions(RoleFunctionInputData roleFunctionData, Long tenantId  , Long dataSourceId) throws JsonProcessingException;
 
     public List<RoleFunctionData> getRoleFunctionsByTenantId(Long tenantId );
 

@@ -1,16 +1,20 @@
 package com.example.cruddata.service.imp;
 
+import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.constant.FunctionGroupType;
 import com.example.cruddata.constant.FunctionType;
 import com.example.cruddata.dto.web.RoleFunctionData;
 import com.example.cruddata.dto.web.RoleFunctionInputData;
 import com.example.cruddata.entity.authroty.*;
 import com.example.cruddata.exception.BusinessException;
+import com.example.cruddata.exception.MaintainFailException;
 import com.example.cruddata.repository.authroty.AccountRoleConfigRepository;
 import com.example.cruddata.repository.authroty.FunctionRepository;
 import com.example.cruddata.repository.authroty.RoleFunctionRepository;
 import com.example.cruddata.repository.authroty.RoleRepository;
 import com.example.cruddata.service.RoleService;
+import com.example.cruddata.service.SwaggerDocService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +37,8 @@ public class RoleServiceImp implements RoleService {
     public final RoleFunctionRepository roleFunctionRepository;
 
     public final AccountRoleConfigRepository accountRoleConfigRepository;
+
+    private final SwaggerDocService swaggerDocService;
 
 
 
@@ -90,18 +96,18 @@ public class RoleServiceImp implements RoleService {
     @Override
     public RoleFunctionData getRoleFunctionsByRoleId(Long roleId) {
 
-        Role role = this.roleRepository.findById(roleId).get();
-        RoleFunctionData roleFunctionData = null;
+        Optional<Role> role = this.roleRepository.findById(roleId);
 
-        if(null !=role){
-            roleFunctionData = processSettingRoleFunctions(role );
+        if(!role.isPresent()){
+            throw new BusinessException(ApiErrorCode.DEFAULT_ERROR,"Role not exist!",roleId);
         }
+        RoleFunctionData roleFunctionData = processSettingRoleFunctions(role.get() );
 
         return roleFunctionData;
     }
 
     @Override
-    public RoleFunctionData saveRoleFunctions(RoleFunctionInputData roleFunctionInputData , Long tenantId, Long dataSourceId ) {
+    public Map<String,Object> saveRoleFunctions(RoleFunctionInputData roleFunctionInputData , Long tenantId, Long dataSourceId ) throws JsonProcessingException {
         List<String> tables =  roleFunctionInputData.getFunctionActions().keySet().stream().toList();
         List<Function> functions =  this.functionRepository.findByFunctionNameInAndGroupTypeAndTenantIdAndDataSourceIdOrderByDisplayOrder(tables,FunctionGroupType.DATA_SWAGGER.name() , tenantId,dataSourceId);
 
@@ -115,10 +121,12 @@ public class RoleServiceImp implements RoleService {
         });
 
         Map<String,String> errorMsg = new HashMap<>();
+
         roleFunctionInputData.getFunctionActions().forEach((table,actionList)->{
 
             boolean isTableNotCorrect  = !functionActions.containsKey(table);
             Map<String ,Function> functionMap = functionActions.get(table);
+            actionList.replaceAll(String::toUpperCase);
             boolean isTableActionNotCorrect = !isTableNotCorrect? !functionMap.keySet().stream().toList().containsAll(actionList): !functionActions.containsKey(table);
             if(  isTableNotCorrect || isTableActionNotCorrect ) {
                 String msg = isTableNotCorrect ? "table("+ table+") not open to is use" : "table("+ table+") action only open "+functionActions.get(table);
@@ -127,14 +135,14 @@ public class RoleServiceImp implements RoleService {
         });
 
         if(errorMsg.size() >0){
-            throw new BusinessException("saveRoleFunctions error happened:: ",errorMsg);
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR,"table error" ,errorMsg);
         }
 
         Role role = new Role();
         if(null != roleFunctionInputData.getRoleId()){
             Optional<Role> roleInDB = this.roleRepository.findById(roleFunctionInputData.getRoleId());
             if( !roleInDB.isPresent()){
-                throw new BusinessException("role id not exist ",roleFunctionInputData.getRoleId());
+                throw new BusinessException(ApiErrorCode.AUTH_ERROR,"role id not exist ",roleFunctionInputData.getRoleId());
             }
             role = roleInDB.get();
         }
@@ -160,8 +168,12 @@ public class RoleServiceImp implements RoleService {
             }
         }
         this.roleFunctionRepository.saveAll(roleFunctionsInsert);
-
-        return getRoleFunctionsByRoleId( role.getId());
+        RoleFunctionData roleFunctionData = getRoleFunctionsByRoleId( role.getId());
+        String swagger = swaggerDocService.genSwaggerDoc(Long.valueOf(role.getId()));
+        Map<String , Object> result= new HashMap<>();
+        result.put("swagger",swagger);
+        result.put("roleFunction",roleFunctionData);
+        return result;
     }
 
     @Override
@@ -183,11 +195,11 @@ public class RoleServiceImp implements RoleService {
     public RoleFunctionData getRoleFunctionsByAccount(Long accountId) {
         AccountRole accountRole = this.accountRoleConfigRepository.findByAccountId(accountId);
         if(null == accountRole){
-            throw new BusinessException("accountId is not set role, please contact with admin");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"accountId is not set role, please contact with admin",accountId);
         }
         Role role = this.roleRepository.findById(accountRole.getRoleId()).get();
         if(null == role){
-            throw new BusinessException("role is not exist, please contact with admin");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"role is not exist, please contact with admin",accountId);
         }
         RoleFunctionData roleFunctionData = this.getRoleFunctionsByRoleId(role.getId());
         return roleFunctionData;
@@ -244,7 +256,7 @@ public class RoleServiceImp implements RoleService {
             });
             this.functionRepository.saveAll(functions);
         }catch (Exception exception){
-            throw new BusinessException("createFunction...exception For actionType {}", actionTypes);
+            throw new BusinessException(ApiErrorCode.MAINTAIN_FAIL, "createFunction...exception For actionType {}", actionTypes);
         }
 
     }
@@ -266,7 +278,7 @@ public class RoleServiceImp implements RoleService {
                 this.accountRoleConfigRepository.save(accountRoleInDb);
             }
         }else {
-            throw new BusinessException("role is not exist {}", roleId);
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"role is not exist {}", roleId);
         }
     }
 

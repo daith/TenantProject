@@ -1,8 +1,10 @@
 package com.example.cruddata.service.imp;
 
+import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.constant.RedisKeyConsts;
 import com.example.cruddata.constant.Status;
 import com.example.cruddata.entity.system.DataSourceConfig;
+import com.example.cruddata.exception.BusinessException;
 import com.example.cruddata.repository.system.ColumnConfigRepository;
 import com.example.cruddata.repository.system.DataSourceConfigRepository;
 import com.example.cruddata.service.DataSourceService;
@@ -14,9 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class DataSourceServiceImp implements DataSourceService {
@@ -31,25 +31,28 @@ public class DataSourceServiceImp implements DataSourceService {
 
     @Autowired
     private TenantService tenantService;
-    @Override
-    public List<Map<String, Object>> list() {
-        return null;
-    }
 
-    @Override
-    public void deleteDataSourceConfig(DataSourceConfig recordList) {
-
-    }
-
-    @Override
-    public void updateDataSourceConfig(DataSourceConfig recordList) {
-
-    }
 
     @Override
     public void createDataSourceConfig(DataSourceConfig record) {
 
         tenantService.validatedTenantProcess(record.getTenantId());
+        if( null != record.getId()){
+           Optional<DataSourceConfig> dataSourceConfig = dataSourceConfigRepository.findById(record.getId());
+           if(dataSourceConfig.isPresent() && dataSourceConfig.get().getTenantId() !=  record.getTenantId()){
+               throw new BusinessException(ApiErrorCode.AUTH_ERROR,"This tenant Id could not maintain this data source", record);
+           }
+
+            if(!dataSourceConfig.isPresent() ){
+                throw new BusinessException(ApiErrorCode.VALIDATED_ERROR,"Data source not exist!", record);
+            }
+        }else{
+            record.setCreateTime(new Date());
+            record.setUpdateTime(new Date());
+            record.setStatus(Status.ACTIVE);
+            record.setIsDeleted(Boolean.FALSE);
+        }
+
 
         dataSourceConfigRepository.save(record);
 

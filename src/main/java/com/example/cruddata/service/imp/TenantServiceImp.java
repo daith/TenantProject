@@ -6,6 +6,7 @@ import com.example.cruddata.constant.Status;
 import com.example.cruddata.entity.authroty.Tenant;
 import com.example.cruddata.entity.system.DataSourceConfig;
 import com.example.cruddata.exception.BusinessException;
+import com.example.cruddata.exception.TenantNotFoundException;
 import com.example.cruddata.repository.authroty.TenantRepository;
 import com.example.cruddata.service.TenantService;
 import com.example.cruddata.util.RedisUtil;
@@ -43,7 +44,7 @@ public class TenantServiceImp implements TenantService {
         }
 
         if( data != null  && data.getIsDeleted() == true){
-            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "tenantId is not useful");
+            throw new TenantNotFoundException();
         }
     }
 

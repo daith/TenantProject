@@ -1,5 +1,6 @@
 package com.example.cruddata.service.imp;
 
+import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.constant.ColumnConsts;
 import com.example.cruddata.constant.FunctionType;
 import com.example.cruddata.dto.swagger.*;
@@ -45,10 +46,10 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
     RoleRepository roleRepository;
 
     @Override
-    public void genSwaggerDoc(Long roleId) throws JsonProcessingException {
+    public String genSwaggerDoc(Long roleId) throws JsonProcessingException {
         Optional<Role> roleInDb = roleRepository.findById(roleId);
         if(!roleInDb.isPresent()){
-            throw new BusinessException("no role in use {}",roleId);
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"no role in use {}",roleId);
         }
         List<RoleFunction> roleFunctions = roleFunctionRepository.findByRoleId(roleId);
         List<Long> funstionIdList = roleFunctions.stream().map(RoleFunction::getFunctionId).collect(Collectors.toList());
@@ -102,6 +103,8 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
             throw new RuntimeException(e);
         }
 
+        return "/web/"+roleInDb.get().getRoleName()+"/swagger#/";
+
     }
 
     private SwaggerDocData dataArrangeProcess( Map<String,TableConfig> tableConfigHashMap , Map<String,List<ColumnConfig>> columnConfigHashMap , Map<String,List<Function>> urlAction){
@@ -134,6 +137,7 @@ public class SwaggerDocServiceImp implements SwaggerDocService {
             dataList.forEach(column->{
                 Map<String,String> columInfo = new HashMap<String,  String>();
                 columInfo.put("type", ColumnConsts.getDataTypeToCode( column.getDataType()));
+                columInfo.put("description", column.getCaption());
                 schemasData.getProperties().put(column.getName(),columInfo);
             });
 

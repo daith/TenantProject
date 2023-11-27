@@ -1,5 +1,6 @@
 package com.example.cruddata.service.imp;
 
+import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.dto.web.AccountConditionData;
 import com.example.cruddata.dto.web.AccountData;
 import com.example.cruddata.dto.web.RoleFunctionData;
@@ -64,7 +65,7 @@ public class AccountServiceImp implements AccountService {
     public Account getAccountByAccountCondition(AccountConditionData account) {
 
         if(null == account.getTenantId() && null == account.getName() && account.getName().isEmpty()){
-            throw new BusinessException("query condition not enough TenantId({}),Name({})",account.getTenantId() , account.getName() );
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR,"query condition not enough TenantId({}),Name({})",account.getTenantId() , account.getName() );
         }
 
         tenantService.validatedTenantProcess(account.getTenantId());
@@ -105,7 +106,7 @@ public class AccountServiceImp implements AccountService {
             redisUtil.add(token, "roleFunction", roleFunctionData);
             return token;
         }else {
-            throw new BusinessException("account not exist", accountData);
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"account not exist", accountData);
         }
 
     }

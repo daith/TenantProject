@@ -3,6 +3,7 @@ package com.example.cruddata.controller;
 import com.example.cruddata.exception.InvalidDbPropertiesException;
 import com.example.cruddata.service.DocumentService;
 import com.example.cruddata.service.SwaggerDocService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -80,30 +81,10 @@ public class FileController {
         }
     }
 
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},value="{dataSourceId}")
-    public ResponseEntity<?> fileUploadImportCreateTables(@PathVariable(value = "dataSourceId",required = false) String dataSourceId,  @RequestParam("file") MultipartFile file, @RequestHeader(value = "X-TenantID",required = false) String tenantId) {
 
-        log.info("[i] fileUploadImportCreateTables  info {}", file);
-
-        if(file.getSize() ==0){
-            log.error("[!]  file must not full!");
-            return ResponseEntity.ok(new InvalidDbPropertiesException());
-        }
-
-        try {
-            List<Object> result = documentService.importTablesViaFile( Long.valueOf(dataSourceId), Long.valueOf(tenantId) , file);
-
-
-            return ResponseEntity.ok(result);
-
-
-        } catch (Exception e) {
-            return ResponseEntity.ok(e);
-        }
-    }
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},value="codeList/{dataSourceId}")
-    public ResponseEntity<?> fileUploadImportCodeList(@PathVariable(value = "dataSourceId",required = false) String dataSourceId,  @RequestParam("file") MultipartFile file, @RequestHeader(value = "X-TenantID",required = false) String tenantId) {
+    public ResponseEntity<?> fileUploadImportCodeList(@PathVariable(value = "dataSourceId",required = false) String dataSourceId,  @RequestParam("file") MultipartFile file, @RequestHeader(value = "X-TenantID",required = false) String tenantId) throws Exception {
 
         log.info("[i] fileUploadImportCreateTables  info {}", file);
 
@@ -112,24 +93,14 @@ public class FileController {
             return ResponseEntity.ok(new InvalidDbPropertiesException());
         }
 
-        try {
-            List<Object> result = documentService.importCodeListViaFile( Long.valueOf(dataSourceId), Long.valueOf(tenantId) , file);
-            return ResponseEntity.ok(result);
-
-
-        } catch (Exception e) {
-            return ResponseEntity.ok(e);
-        }
+        List<Object> result = documentService.importCodeListViaFile( Long.valueOf(dataSourceId), Long.valueOf(tenantId) , file);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping(value="roleJsonFile/{roleId}")
-    public ResponseEntity<?> roleJsonFile( @RequestParam("roleId") String roleId ) {
-        try {
-            swaggerDocService.genSwaggerDoc(Long.valueOf(roleId));
-            return ResponseEntity.ok(roleId);
-        } catch (Exception e) {
-            return ResponseEntity.ok(e);
-        }
+    public ResponseEntity<?> roleJsonFile( @RequestParam("roleId") String roleId ) throws JsonProcessingException {
+
+        return ResponseEntity.ok(swaggerDocService.genSwaggerDoc(Long.valueOf(roleId)));
     }
 
 

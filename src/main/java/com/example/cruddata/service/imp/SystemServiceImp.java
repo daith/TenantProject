@@ -76,7 +76,7 @@ public class SystemServiceImp implements SystemService {
             Map<String,Object> errorMsg = new HashMap<>();
             errorMsg.put(ApiErrorCode.COLUMNS_OF_TABLE_DELETE_NOT_CLEAR,columnValidatorResult.getTotalColumnsBySituationTableTenant());
             errorMsg.put(ApiErrorCode.TENANT_TABLE_NOT_EXITS_ERROR,columnValidatorResult.getNotExitTableByTenant());
-            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , errorMsg);
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "Data Error",errorMsg);
         }
 
         // delete column

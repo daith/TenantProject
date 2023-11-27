@@ -1,5 +1,6 @@
 package com.example.cruddata.util;
 
+import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.exception.BusinessException;
 
 import java.math.BigInteger;
@@ -34,7 +35,7 @@ public class EncryptUtil {
             if(null != parameters.get(DATA_DATE) && null != parameters.get(DATA_VALUE) && null != parameters.get(DATA_SOAP)){
                 ret = getMD5(parameters.get(DATA_DATE)+"_"+parameters.get(DATA_VALUE)+"_"+parameters.get(DATA_SOAP));
             }else{
-                throw new BusinessException("data not complete!",parameters );
+                throw new BusinessException(ApiErrorCode.VALIDATED_ERROR,"data not complete!",parameters );
             }
         return ret;
     }

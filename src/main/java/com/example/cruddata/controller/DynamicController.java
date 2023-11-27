@@ -1,5 +1,6 @@
 package com.example.cruddata.controller;
 
+import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.constant.FunctionType;
 import com.example.cruddata.dto.web.RoleFunctionData;
 import com.example.cruddata.entity.authroty.Function;
@@ -39,17 +40,17 @@ public class DynamicController {
         String token = CommonUtils.getHeaderToken(headers);
 
         if (null == redisUtil.getHashEntries(token)) {
-            throw new BusinessException("token not correct.");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"token not correct.");
         }
 
         RoleFunctionData roleFunction = (RoleFunctionData) redisUtil.getHashEntries(token).get("roleFunction");
         Map<String , Function> functionMap = roleFunction.getFunctionActions().get(tableName);
        if(null == functionMap){
-           throw new BusinessException("you cant use this table.");
+           throw new BusinessException(ApiErrorCode.AUTH_ERROR,"you cant use this table.");
        }
         Function function = functionMap.get(FunctionType.QUERY.toString());
         if(null == function){
-            throw new BusinessException("you cant use this table query.");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"you cant use this table query.");
         }
         return ResponseEntity.ok( dynamicService.getAllDataFromTable(function));
     }
@@ -60,17 +61,17 @@ public class DynamicController {
         String token = CommonUtils.getHeaderToken(headers);
 
         if (null == redisUtil.getHashEntries(token)) {
-            throw new BusinessException("token not correct.");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"token not correct.");
         }
 
         RoleFunctionData roleFunction = (RoleFunctionData) redisUtil.getHashEntries(token).get("roleFunction");
         Map<String , Function> functionMap = roleFunction.getFunctionActions().get(tableName);
         if(null == functionMap){
-            throw new BusinessException("you cant use this table.");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"you cant use this table.");
         }
         Function function = functionMap.get(FunctionType.QUERY.toString());
         if(null == function){
-            throw new BusinessException("you cant use this table query.");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"you cant use this table query.");
         }
 
 
@@ -83,17 +84,17 @@ public class DynamicController {
         String token = CommonUtils.getHeaderToken(headers);
 
         if (null == redisUtil.getHashEntries(token)) {
-            throw new BusinessException("token not correct.");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"token not correct.");
         }
 
         RoleFunctionData roleFunction = (RoleFunctionData) redisUtil.getHashEntries(token).get("roleFunction");
         Map<String , Function> functionMap = roleFunction.getFunctionActions().get(tableName);
         if(null == functionMap){
-            throw new BusinessException("you cant use this table.");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"you cant use this table.");
         }
         Function function = functionMap.get(FunctionType.QUERY.toString());
         if(null == function){
-            throw new BusinessException("you cant use this table query.");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"you cant use this table query.");
         }
 
 
@@ -106,17 +107,17 @@ public class DynamicController {
         String token = CommonUtils.getHeaderToken(headers);
 
         if (null == redisUtil.getHashEntries(token)) {
-            throw new BusinessException("token not correct.");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"token not correct.");
         }
 
         RoleFunctionData roleFunction = (RoleFunctionData) redisUtil.getHashEntries(token).get("roleFunction");
         Map<String , Function> functionMap = roleFunction.getFunctionActions().get(tableName);
         if(null == functionMap){
-            throw new BusinessException("you cant use this table.");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"you cant use this table.");
         }
         Function function = functionMap.get(FunctionType.QUERY.toString());
         if(null == function){
-            throw new BusinessException("you cant use this table query.");
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"you cant use this table query.");
         }
 
 
