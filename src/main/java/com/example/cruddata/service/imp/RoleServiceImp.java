@@ -25,7 +25,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class RoleServiceImp implements RoleService {
 
     private static final Logger log = LoggerFactory.getLogger(DocumentServiceImp.class);

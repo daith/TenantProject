@@ -1,5 +1,6 @@
 package com.example.cruddata.service;
 
+import com.example.cruddata.dto.web.CreateEntityData;
 import com.example.cruddata.entity.system.ColumnConfig;
 import com.example.cruddata.entity.system.TableConfig;
 
@@ -19,4 +20,10 @@ public interface TableColumnService {
     void deleteTableConfig(Long tenantId , Long dataSourceId , String tableName) throws SQLException;
 
     void deleteAllTableByDataSource(Long tenantId , Long dataSourceId);
-}
+
+    public void createTable(CreateEntityData createEntity, Long tenantId) throws SQLException ;
+
+    public List<TableConfig> getTableConfigs(Long dataSourceId, String tableName, Long tenantId) ;
+
+
+    }

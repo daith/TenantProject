@@ -2,6 +2,7 @@ package com.example.cruddata.service.imp;
 
 import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.constant.Status;
+import com.example.cruddata.dto.web.CreateEntityData;
 import com.example.cruddata.dto.web.RoleFunctionData;
 import com.example.cruddata.entity.authroty.RoleFunction;
 import com.example.cruddata.entity.system.ColumnConfig;
@@ -10,11 +11,9 @@ import com.example.cruddata.entity.system.TableConfig;
 import com.example.cruddata.exception.BusinessException;
 import com.example.cruddata.exception.InvalidDbPropertiesException;
 import com.example.cruddata.repository.system.ColumnConfigRepository;
+import com.example.cruddata.repository.system.DataSourceConfigRepository;
 import com.example.cruddata.repository.system.TableConfigRepository;
-import com.example.cruddata.service.DataService;
-import com.example.cruddata.service.DataSourceService;
-import com.example.cruddata.service.RoleService;
-import com.example.cruddata.service.TableColumnService;
+import com.example.cruddata.service.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
 @Service
 public class TableColumnServiceImp implements TableColumnService{
 
@@ -41,6 +38,11 @@ public class TableColumnServiceImp implements TableColumnService{
     @Autowired
     public  DataSourceService dataSourceService;
 
+    @Autowired
+    DataSourceConfigRepository dataSourceConfigRepository;
+
+    @Autowired
+    public TenantService tenantService;
     @Override
     public List<ColumnConfig> getActiveColumnByTenantIdAndTableId(Long tenantId, Long tableId) {
         return columnConfigRepository.findByTenantIdAndIsDeletedAndTableId(tenantId , Boolean.FALSE , tableId);
@@ -146,6 +148,71 @@ public class TableColumnServiceImp implements TableColumnService{
 
 
 
+    }
+
+    @Override
+    public void createTable(CreateEntityData createEntity, Long tenantId) throws SQLException {
+        log.info("process createTable start!");
+
+        tenantService.validatedTenantProcess(tenantId);
+
+        Optional<DataSourceConfig> dataSourceConfig = this.dataSourceConfigRepository.findByIdAndTenantIdAndIsDeleted(createEntity.getDatasourceId(),tenantId,Boolean.FALSE);
+        if(!dataSourceConfig.isPresent()){
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "datasource is not exist or you cant use this datasource");
+        }
+
+
+        List<TableConfig> tables =this.tableConfigRepository.findTableConfigByNameAndTenantIdAndIsDeletedAndDataSourceId(createEntity.getTableName(),tenantId,Boolean.FALSE,createEntity.getDatasourceId());
+        if(tables.size() > 0){
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "table name is exist in this datasource",tables);
+        }
+
+        log.info("process data validator done!");
+
+        dataService.createTable(dataSourceConfig.get().getId() , dataSourceConfig.get().getDatabaseType() , createEntity);
+
+        log.info("process create physical table done!");
+
+        TableConfig tableConfig = new TableConfig();
+        tableConfig.setCaption(createEntity.getCaption());
+        tableConfig.setName(createEntity.getTableName());
+        tableConfig.setDataSourceId(createEntity.getDatasourceId());
+        tableConfig.setTenantId(tenantId);
+        this.tableConfigRepository.save(tableConfig);
+
+        log.info("process insert tableConfig date done!");
+
+        List<ColumnConfig> columnConfigs = new ArrayList<>();
+        createEntity.columnEntityList.forEach(item->{
+            ColumnConfig record = new ColumnConfig();
+            record.setCaption(item.getCaption());
+            record.setName(item.getName());
+            record.setTableId(tableConfig.getId());
+            record.setTenantId(tenantId);
+            record.setDataType(item.getDataType());
+            record.setIsDeleted(Boolean.FALSE);
+            columnConfigs.add(record);
+        });
+        this.columnConfigRepository.saveAll(columnConfigs);
+        log.info("process insert columnConfigs done!");
+
+        log.info("process createTable end!");
+    }
+
+    @Override
+    public List<TableConfig> getTableConfigs(Long dataSourceId, String tableName, Long tenantId) {
+        tenantService.validatedTenantProcess(tenantId);
+
+        Optional<DataSourceConfig> dataSourceConfig = this.dataSourceConfigRepository.findByIdAndTenantIdAndIsDeleted(dataSourceId, tenantId,Boolean.FALSE);
+        if(!dataSourceConfig.isPresent()){
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "datasource is not exist or you cant use this datasource");
+        }
+
+        List<TableConfig> tables =this.tableConfigRepository.findTableConfigByNameAndTenantIdAndIsDeletedAndDataSourceId(tableName, tenantId,Boolean.FALSE, dataSourceId);
+        if(tables.size() != 1 && null != tableName){
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "table name  multiple in this datasource",tables);
+        }
+        return tables;
     }
 
 

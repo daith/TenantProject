@@ -2,11 +2,8 @@ package com.example.cruddata.controller;
 
 import com.example.cruddata.constant.ApiErrorCode;
 import com.example.cruddata.dto.web.CreateEntityData;
-import com.example.cruddata.entity.system.TableConfig;
 import com.example.cruddata.exception.BusinessException;
-import com.example.cruddata.exception.InvalidDbPropertiesException;
 import com.example.cruddata.service.DocumentService;
-import com.example.cruddata.service.SystemService;
 import com.example.cruddata.service.TableColumnService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.SQLException;
-import java.util.List;
 
 @Api(tags ="資料源-資料表表")
 @RestController
@@ -29,8 +25,6 @@ public class TableController {
     private final DocumentService documentService;
 
     private static final Logger log = LoggerFactory.getLogger(TableController.class);
-
-    private final SystemService systemService;
 
     private final TableColumnService tableColumnService;
 
@@ -46,7 +40,7 @@ public class TableController {
             throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "[!] Received database params are incorrect or not full!",createEntity);
         }
 
-        systemService.createTable( createEntity, Long.valueOf(tenantId));
+        tableColumnService.createTable( createEntity, Long.valueOf(tenantId));
         log.info("[i] Loaded DataSource for tenant '{}'.", tenantId);
         return ResponseEntity.ok(createEntity);
     }
@@ -56,7 +50,7 @@ public class TableController {
 
         log.info("[i] getTables table info {}", dataSourceId);
 
-        return ResponseEntity.ok(systemService.getTableConfigs(dataSourceId, null, Long.valueOf(tenantId)));
+        return ResponseEntity.ok(tableColumnService.getTableConfigs(dataSourceId, null, Long.valueOf(tenantId)));
     }
 
     @DeleteMapping("/{dataSourceId}")
@@ -64,7 +58,7 @@ public class TableController {
 
         log.info("[i] getTable table info {}", dataSourceId +"("+tableName+")");
 
-        return ResponseEntity.ok(systemService.getTableConfigs(dataSourceId, tableName, Long.valueOf(tenantId)));
+        return ResponseEntity.ok(tableColumnService.getTableConfigs(dataSourceId, tableName, Long.valueOf(tenantId)));
     }
 
     @DeleteMapping("deleteAll/{dataSourceId}")

@@ -36,10 +36,6 @@ public class DocumentServiceImp implements DocumentService {
 
     private static final Logger log = LoggerFactory.getLogger(DocumentServiceImp.class);
 
-
-    @Autowired
-    SystemService systemService;
-
     @Autowired
     DataSourceConfigRepository dataSourceConfigRepository;
 
@@ -70,7 +66,7 @@ public class DocumentServiceImp implements DocumentService {
 
         log.info("process excelDownloadＶaiTable start!");
 
-        List<TableConfig> tables = systemService.getTableConfigs(dataSourceId, tableName, tenantId);
+        List<TableConfig> tables = tableColumnService.getTableConfigs(dataSourceId, tableName, tenantId);
 
         List<ColumnConfig> columns =  tableColumnService.getActiveColumnByTenantIdAndTableId(tenantId , tables.get(0).getId());
         List<String> excelHeaders = new ArrayList<String>();
@@ -106,7 +102,7 @@ public class DocumentServiceImp implements DocumentService {
          * */
         log.info("process importDataViaFile start!");
 
-        List<TableConfig> tables = systemService.getTableConfigs(dataSourceId, tableName, tenantId);
+        List<TableConfig> tables = tableColumnService.getTableConfigs(dataSourceId, tableName, tenantId);
 
         /*
          * step 2 of data process of validate of file basic condition
