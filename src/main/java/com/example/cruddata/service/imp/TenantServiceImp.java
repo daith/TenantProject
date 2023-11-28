@@ -68,6 +68,11 @@ public class TenantServiceImp implements TenantService {
     }
 
     @Override
+    public Tenant getTenantByName(String tenantName) {
+        return tenantRepository.findByCompanyName(tenantName);
+    }
+
+    @Override
     public Tenant updateTenant(Tenant tenant) {
 
         if(null != this.getTenantById(tenant.getId())){

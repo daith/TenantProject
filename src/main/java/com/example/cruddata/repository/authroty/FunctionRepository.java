@@ -26,4 +26,7 @@ public interface FunctionRepository extends CrudRepository<Function, Long> {
     @Override
     List<Function> findAllById(Iterable<Long> ids);
 
+    List<Function> findByFunctionName(@Param("functionName")String functionName);
+
+
 }

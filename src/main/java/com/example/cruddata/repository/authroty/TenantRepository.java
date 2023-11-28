@@ -16,6 +16,8 @@ public interface TenantRepository extends CrudRepository<Tenant, Long> {
     @Query("SELECT c FROM Tenant c WHERE (:isDeleted is null or c.isDeleted = :isDeleted) and (:status is null or c.status = :status)")
     public List<Tenant> findByStatusAndStatus(String status , Boolean isDeleted);
 
+    public Tenant findByCompanyName(String name);
+
     @Override
     List<Tenant> findAll();
 }

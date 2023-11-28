@@ -1,18 +1,15 @@
 package com.example.cruddata.controller;
 
 import com.example.cruddata.constant.ApiErrorCode;
-import com.example.cruddata.dto.business.TenantData;
 import com.example.cruddata.dto.web.AccountConditionData;
 import com.example.cruddata.dto.web.AccountData;
 import com.example.cruddata.dto.web.RoleFunctionData;
 import com.example.cruddata.dto.web.RoleFunctionInputData;
 import com.example.cruddata.entity.authroty.Account;
-import com.example.cruddata.entity.authroty.Tenant;
 import com.example.cruddata.exception.BusinessException;
 import com.example.cruddata.service.AccountService;
+import com.example.cruddata.service.FunctionService;
 import com.example.cruddata.service.RoleService;
-import com.example.cruddata.service.TenantService;
-import com.example.cruddata.util.EncryptUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Api(tags ="帳號權限 - 新增,修改,刪除")
 @RestController
@@ -35,15 +30,17 @@ public class AuthrotyController {
 
     private final RoleService roleService;
 
+    private final FunctionService functionService;
+
 
     @GetMapping(value="/rolesFunctions")
     public ResponseEntity<?> getRolesFunctions() {
-        return ResponseEntity.ok(this.roleService.getRoleFunctions());
+        return ResponseEntity.ok(this.functionService.getRoleFunctions());
     }
 
     @GetMapping(value="/rolesFunction/{roleId}")
     public ResponseEntity<?> getRolesFunction(@PathVariable(name = "roleId")String roleId) {
-        return ResponseEntity.ok(this.roleService.getRoleFunctionsByRoleId(Long.valueOf(roleId)));
+        return ResponseEntity.ok(this.functionService.getRoleFunctionsByRoleId(Long.valueOf(roleId)));
     }
 
     @PostMapping(value="/rolesFunction/{tenantId}/datasource/{datasourceId}")
@@ -76,7 +73,7 @@ public class AuthrotyController {
         }
 
         this.roleService.saveRoleAccount(accountInDB , Long.valueOf(roleId));
-        RoleFunctionData roleFunctionData =this.roleService.getRoleFunctionsByAccount(accountInDB.getId());
+        RoleFunctionData roleFunctionData =this.functionService.getRoleFunctionsByAccount(accountInDB.getId());
 
         return ResponseEntity.ok(roleFunctionData);
     }

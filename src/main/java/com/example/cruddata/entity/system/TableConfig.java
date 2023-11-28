@@ -21,7 +21,7 @@ public class TableConfig extends BasicEntity {
     public String category;
     public String moduleName;
     public Integer updateById;
-    public Integer createById;
+    public Long createById;
 
     public Long dataSourceId;
 

@@ -9,6 +9,7 @@ import com.example.cruddata.exception.BusinessException;
 import com.example.cruddata.repository.system.DataSourceConfigRepository;
 import com.example.cruddata.service.*;
 import com.example.cruddata.util.FileUtils;
+import com.example.cruddata.util.RedisUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -52,7 +53,8 @@ public class DocumentServiceImp implements DocumentService {
 
     @Autowired
     RoleService roleService;
-
+    @Autowired
+    FunctionService functionService;
 
 
     @Override
@@ -62,15 +64,8 @@ public class DocumentServiceImp implements DocumentService {
 
     @Override
     public ByteArrayOutputStream excelDownloadＶaiTable(Long dataSourceId, String tableName, Long tenantId) throws Exception{
-
-
         log.info("process excelDownloadＶaiTable start!");
-
-        List<TableConfig> tables = tableColumnService.getTableConfigs(dataSourceId, tableName, tenantId);
-
-        List<ColumnConfig> columns =  tableColumnService.getActiveColumnByTenantIdAndTableId(tenantId , tables.get(0).getId());
         List<String> excelHeaders = new ArrayList<String>();
-        columns.forEach(item->{excelHeaders.add(item.getName().trim());});
         ByteArrayOutputStream file = FileUtils.genExcelFile(excelHeaders, tableName);
         log.info("process data validator done!");
         return file;
@@ -93,23 +88,26 @@ public class DocumentServiceImp implements DocumentService {
 
         Optional<DataSourceConfig> dataSourceConfig = this.dataSourceConfigRepository.findByIdAndTenantIdAndIsDeleted(dataSourceId,tenantId,Boolean.FALSE);
         if(!dataSourceConfig.isPresent()){
-            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "datasource is not exist or you cant use this datasource");
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "datasource is not exist");
         }
-
 
         /*
          * step 1 of data process of validate of authority , if pass , get the table info
          * */
         log.info("process importDataViaFile start!");
 
-        List<TableConfig> tables = tableColumnService.getTableConfigs(dataSourceId, tableName, tenantId);
+        TableConfig table = tableColumnService.getTableConfig(dataSourceId, tableName, tenantId);
+        if(table == null){
+            throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "table is not exist");
+        }
+
 
         /*
          * step 2 of data process of validate of file basic condition
          * */
 
         // read column list to map of list
-        List<ColumnConfig> columnConfigs =  tableColumnService.getActiveColumnByTenantIdAndTableId(tenantId , tables.get(0).getId());
+        List<ColumnConfig> columnConfigs =  tableColumnService.getActiveColumnByTenantIdAndTableId(tenantId , table.getId());
         Map<String, ColumnConfig> columnConfigsMap=  columnConfigs.stream()
                 .collect(Collectors.toMap(ColumnConfig::getName, columnConfig -> columnConfig));
 
@@ -136,7 +134,7 @@ public class DocumentServiceImp implements DocumentService {
             }
         });
 
-        if( tables.size() != cellIndex.size()) {
+        if( columnConfigs.size() != cellIndex.size()) {
             throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "data column not collect please check!", columnConfigsMap.keySet());
         }
 
@@ -349,8 +347,8 @@ public class DocumentServiceImp implements DocumentService {
             tableColumnService.saveColumnConfig(columnConfig);
         });
 
-        roleService.deleteFunction( tableName,  tenantId,dataSourceId);
-        roleService.createFunction(tableName, tableConfig.getCaption(),  tableConfig.getTenantId() ,FunctionType.getApiCommonFuncType(),dataSourceId , tableConfig.getId());
+        functionService.deleteFunction( tableName,  tenantId,dataSourceId);
+        functionService.createFunction(tableName, tableConfig.getCaption(),  tableConfig.getTenantId() ,FunctionType.getApiCommonFuncType(),dataSourceId , tableConfig.getId());
         createdTables.add(tableName);
     }
 

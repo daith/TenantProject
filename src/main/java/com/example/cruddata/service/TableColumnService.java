@@ -25,5 +25,7 @@ public interface TableColumnService {
 
     public List<TableConfig> getTableConfigs(Long dataSourceId, String tableName, Long tenantId) ;
 
+    public TableConfig getTableConfig(Long dataSourceId, String tableName, Long tenantId) ;
+
 
     }

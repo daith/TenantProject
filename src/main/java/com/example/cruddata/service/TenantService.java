@@ -13,6 +13,8 @@ public interface TenantService {
 
     Tenant getTenantById(Long tenantId);
 
+    Tenant getTenantByName(String tenantName);
+
     Tenant updateTenant(Tenant tenant);
 
     void addTenant(Tenant tenantData) throws JsonProcessingException;

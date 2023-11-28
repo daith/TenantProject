@@ -1,19 +1,27 @@
 package com.example.cruddata.service.imp;
 
 import com.example.cruddata.constant.ApiErrorCode;
+import com.example.cruddata.constant.FunctionType;
+import com.example.cruddata.constant.SystemConsts;
 import com.example.cruddata.dto.web.AccountConditionData;
 import com.example.cruddata.dto.web.AccountData;
 import com.example.cruddata.dto.web.RoleFunctionData;
+import com.example.cruddata.dto.web.TokenRoleFunctionResult;
 import com.example.cruddata.entity.authroty.Account;
+import com.example.cruddata.entity.authroty.Function;
 import com.example.cruddata.exception.BusinessException;
+import com.example.cruddata.exception.InvalidDbPropertiesException;
 import com.example.cruddata.repository.authroty.AccountRepository;
 import com.example.cruddata.service.AccountService;
+import com.example.cruddata.service.FunctionService;
 import com.example.cruddata.service.RoleService;
 import com.example.cruddata.service.TenantService;
+import com.example.cruddata.util.CommonUtils;
 import com.example.cruddata.util.EncryptUtil;
 import com.example.cruddata.util.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,6 +34,9 @@ public class AccountServiceImp implements AccountService {
     public  TenantService tenantService;
     @Autowired
     private  RoleService roleService;
+
+    @Autowired
+    private FunctionService functionService;
     @Autowired
     private  RedisUtil redisUtil;
 
@@ -76,7 +87,7 @@ public class AccountServiceImp implements AccountService {
         account.setTenantId(accountData.getTenantId());
         Account accountInDB = this.getAccountByAccountCondition(account);
         if(null!=accountInDB && EncryptUtil.getMD5(accountData.getPassword()).equals(accountInDB.getPassword())){
-            RoleFunctionData roleFunctionData =  this.roleService.getRoleFunctionsByAccount( accountInDB.getId());
+            RoleFunctionData roleFunctionData =  this.functionService.getRoleFunctionsByAccount( accountInDB.getId());
             StringBuilder tokeData= new StringBuilder();
             tokeData.append("accountId-").append(accountInDB.getId()).append("roleId-").append(roleFunctionData.getRoleId());
             Calendar cal = Calendar.getInstance();
@@ -109,5 +120,37 @@ public class AccountServiceImp implements AccountService {
     @Override
     public Boolean tokenValidationNotExist(String token) throws JsonProcessingException {
         return redisUtil.getHashEntries(token).size() == 0;
+    }
+
+    @Override
+    public TokenRoleFunctionResult tokenRoleFunctionValidation(String token, String tableName) throws JsonProcessingException {
+
+        TokenRoleFunctionResult tokenRoleFunctionResult = new TokenRoleFunctionResult();
+        if (null == redisUtil.getHashEntries(token)) {
+            throw new BusinessException(ApiErrorCode.AUTH_ERROR,"token is validator correct.");
+        }
+
+        RoleFunctionData roleFunction = (RoleFunctionData) redisUtil.getHashEntries(token).get("roleFunction");
+        Map<String , Function> functionMap;
+
+        if(!roleFunction.getName().equals(SystemConsts.SYSTEM_ADMIN_ROLE_NAME)){
+            functionMap = roleFunction.getFunctionActions().get(tableName);
+            if(null == functionMap){
+                throw new BusinessException(ApiErrorCode.AUTH_ERROR,"you cant use this table.");
+            }
+        } else {
+            functionMap = null;
+        }
+
+        if(null == functionMap){
+           List<Function> functions =  this.functionService.getFunctionByTableName(tableName);
+            functions.forEach(item->{
+                functionMap.put(item.getFunctionType(),item);
+            });
+        }
+
+        tokenRoleFunctionResult.setCorrect(Boolean.TRUE);
+        tokenRoleFunctionResult.setFunctionMapByToken(functionMap);
+        return tokenRoleFunctionResult;
     }
 }

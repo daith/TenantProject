@@ -43,6 +43,9 @@ public class TableColumnServiceImp implements TableColumnService{
 
     @Autowired
     public TenantService tenantService;
+
+    @Autowired
+    public FunctionService functionService;
     @Override
     public List<ColumnConfig> getActiveColumnByTenantIdAndTableId(Long tenantId, Long tableId) {
         return columnConfigRepository.findByTenantIdAndIsDeletedAndTableId(tenantId , Boolean.FALSE , tableId);
@@ -71,7 +74,7 @@ public class TableColumnServiceImp implements TableColumnService{
         List<TableConfig> tableConfig =  this.tableConfigRepository.findTableConfigByNameAndTenantIdAndIsDeletedAndDataSourceId(tableName,tenantId,Boolean.FALSE,dataSourceId);
         if(tableConfig.size()==1){
             //confirm roleFunction
-            List<RoleFunction>  roleFunctions =  this.roleService.getRoleFunctionsByTenantIdAndNameAndDataSource(tenantId ,tableName , dataSourceId );
+            List<RoleFunction>  roleFunctions =  this.functionService.getRoleFunctionsByTenantIdAndNameAndDataSource(tenantId ,tableName , dataSourceId );
 
             if(roleFunctions.size()>0){
                 throw new BusinessException(ApiErrorCode.AUTH_ERROR,"table set role auth {}!",roleFunctions);
@@ -103,7 +106,7 @@ public class TableColumnServiceImp implements TableColumnService{
             item.setUpdateTime(new Date());
         });
         tableConfigRepository.saveAll(tableConfig);
-        this.roleService.deleteFunction( tableName ,  tenantId, dataSourceId);
+        this.functionService.deleteFunction( tableName ,  tenantId, dataSourceId);
     }
 
     private void deleteTableProcess(Long tenantId, Long dataSourceId, String tableName, TableConfig tableConfig, DataSourceConfig dataSourceConfig) throws SQLException {
@@ -117,7 +120,7 @@ public class TableColumnServiceImp implements TableColumnService{
             List<TableConfig> tableConfigs =  this.tableConfigRepository.findTableConfigByNameAndTenantIdAndIsDeletedAndDataSourceId(null,tenantId,Boolean.FALSE,dataSourceId);
 
             // confirm table autho is in use.
-            List<RoleFunctionData> roles = roleService.getRoleFunctionsByTenantId( tenantId);
+            List<RoleFunctionData> roles = functionService.getRoleFunctionsByTenantId( tenantId);
             roles.forEach(roleData->{
                 if(roleData.getFunctionActions().size() >0){
                     throw new BusinessException(ApiErrorCode.AUTH_ERROR,"Pleaser remove All Role function auth setting");
@@ -213,6 +216,12 @@ public class TableColumnServiceImp implements TableColumnService{
             throw new BusinessException(ApiErrorCode.VALIDATED_ERROR , "table name  multiple in this datasource",tables);
         }
         return tables;
+    }
+
+    @Override
+    public TableConfig getTableConfig(Long dataSourceId, String tableName, Long tenantId) {
+        List<TableConfig> result = getTableConfigs( dataSourceId,  tableName,  tenantId);
+        return result.size()>0?result.get(1): null;
     }
 
 

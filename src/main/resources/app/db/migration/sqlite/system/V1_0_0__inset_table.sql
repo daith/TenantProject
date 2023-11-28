@@ -19,11 +19,6 @@ CREATE TABLE `tenant` (
   `is_deleted` BOOLEAN NOT NULL DEFAULT false
 );
 
-INSERT INTO `tenant` (`company_name`)
-VALUES ('datarget-company');
-
-INSERT INTO `tenant` (`company_name`)
-VALUES ('demo-company');
 
 drop table if exists `member`;
 CREATE TABLE `member` (

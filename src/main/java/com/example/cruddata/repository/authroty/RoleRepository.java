@@ -16,4 +16,6 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
     List<Role> findAll();
 
     List<Role> findByTenantId(Long tenantId);
+
+    Role findByTenantIdAndRoleName(Long tenantId,String roleName);
 }

@@ -22,7 +22,7 @@ public class ColumnConfig extends BasicEntity {
     public Boolean nullable;
 
     public Integer updateById;
-    public Integer createById;
+    public Long createById;
     public String dataType;
     public String apiResourceNaming;
     public String apiParamNaming;
