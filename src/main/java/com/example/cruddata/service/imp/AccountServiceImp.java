@@ -1,7 +1,6 @@
 package com.example.cruddata.service.imp;
 
 import com.example.cruddata.constant.ApiErrorCode;
-import com.example.cruddata.constant.FunctionType;
 import com.example.cruddata.constant.SystemConsts;
 import com.example.cruddata.dto.web.AccountConditionData;
 import com.example.cruddata.dto.web.AccountData;
@@ -10,18 +9,14 @@ import com.example.cruddata.dto.web.TokenRoleFunctionResult;
 import com.example.cruddata.entity.authroty.Account;
 import com.example.cruddata.entity.authroty.Function;
 import com.example.cruddata.exception.BusinessException;
-import com.example.cruddata.exception.InvalidDbPropertiesException;
 import com.example.cruddata.repository.authroty.AccountRepository;
 import com.example.cruddata.service.AccountService;
 import com.example.cruddata.service.FunctionService;
-import com.example.cruddata.service.RoleService;
 import com.example.cruddata.service.TenantService;
-import com.example.cruddata.util.CommonUtils;
 import com.example.cruddata.util.EncryptUtil;
 import com.example.cruddata.util.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -32,9 +27,6 @@ public class AccountServiceImp implements AccountService {
     public  AccountRepository accountRepository;
     @Autowired
     public  TenantService tenantService;
-    @Autowired
-    private  RoleService roleService;
-
     @Autowired
     private FunctionService functionService;
     @Autowired

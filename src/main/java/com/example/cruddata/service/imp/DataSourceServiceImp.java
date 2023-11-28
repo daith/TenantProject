@@ -5,26 +5,24 @@ import com.example.cruddata.constant.RedisKeyConsts;
 import com.example.cruddata.constant.Status;
 import com.example.cruddata.entity.system.DataSourceConfig;
 import com.example.cruddata.exception.BusinessException;
-import com.example.cruddata.repository.system.ColumnConfigRepository;
 import com.example.cruddata.repository.system.DataSourceConfigRepository;
 import com.example.cruddata.service.DataSourceService;
 import com.example.cruddata.service.TenantService;
 import com.example.cruddata.util.CommonUtils;
 import com.example.cruddata.util.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DataSourceServiceImp implements DataSourceService {
     @Autowired
     private DataSourceConfigRepository dataSourceConfigRepository;
-
-    @Autowired
-    ColumnConfigRepository columnConfigRepository;
 
     @Autowired
     RedisUtil redisUtil;

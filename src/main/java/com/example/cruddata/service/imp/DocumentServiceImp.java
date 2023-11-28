@@ -52,8 +52,6 @@ public class DocumentServiceImp implements DocumentService {
     TenantService tenantService;
 
     @Autowired
-    RoleService roleService;
-    @Autowired
     FunctionService functionService;
 
 
