@@ -1,7 +1,6 @@
 package com.example.cruddata.init;
 
 import com.example.cruddata.constant.SystemConsts;
-import com.example.cruddata.controller.AuthrotyController;
 import com.example.cruddata.dto.web.AccountConditionData;
 import com.example.cruddata.dto.web.AccountData;
 import com.example.cruddata.entity.authroty.Account;
@@ -10,7 +9,6 @@ import com.example.cruddata.service.AccountService;
 import com.example.cruddata.service.RoleService;
 import com.example.cruddata.service.TenantService;
 import com.example.cruddata.util.EncryptUtil;
-import com.example.cruddata.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
