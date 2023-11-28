@@ -12,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +25,7 @@ import java.util.Properties;
 @EnableJpaRepositories({"com.example.cruddata.repository"})
 @EnableAsync
 @SpringBootApplication
+@EnableScheduling
 public class CrudDataApplication {
 
     private final MultiDataSourceManager multiDataSourceManager;
