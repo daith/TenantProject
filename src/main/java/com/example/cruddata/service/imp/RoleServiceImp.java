@@ -18,6 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -29,16 +30,16 @@ public class RoleServiceImp implements RoleService {
 
     private static final Logger log = LoggerFactory.getLogger(DocumentServiceImp.class);
 
-
-    public  final RoleRepository roleRepository;
-
-    public final FunctionRepository functionRepository;
-
-    public final RoleFunctionRepository roleFunctionRepository;
-
-    public final AccountRoleConfigRepository accountRoleConfigRepository;
-
-    private final SwaggerDocService swaggerDocService;
+    @Autowired
+    public   RoleRepository roleRepository;
+    @Autowired
+    public  FunctionRepository functionRepository;
+    @Autowired
+    public  RoleFunctionRepository roleFunctionRepository;
+    @Autowired
+    public  AccountRoleConfigRepository accountRoleConfigRepository;
+    @Autowired
+    private  SwaggerDocService swaggerDocService;
 
 
 

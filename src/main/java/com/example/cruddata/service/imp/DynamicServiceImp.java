@@ -14,6 +14,7 @@ import com.example.cruddata.service.DataService;
 import com.example.cruddata.service.DataSourceService;
 import com.example.cruddata.service.DynamicService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
@@ -23,14 +24,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class DynamicServiceImp implements DynamicService {
-
-    public final DataService dataService;
-
-    public final DataSourceService dataSourceService;
-
-    public final ColumnConfigRepository columnConfigRepository;
+    @Autowired
+    public  DataService dataService;
+    @Autowired
+    public  DataSourceService dataSourceService;
+    @Autowired
+    public  ColumnConfigRepository columnConfigRepository;
 
 
 

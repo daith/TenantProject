@@ -30,7 +30,7 @@ public class DataSourceServiceImp implements DataSourceService {
     RedisUtil redisUtil;
 
     @Autowired
-    private TenantService tenantService;
+    TenantService tenantService;
 
 
     @Override

@@ -47,7 +47,7 @@ public class AuthrotyController {
     }
 
     @PostMapping(value="/rolesFunction/{tenantId}/datasource/{datasourceId}")
-    public ResponseEntity<?> createRolesFunction(@PathVariable(name = "datasourceId")String datasourceId,@PathVariable(name = "tenantId")String tenantId,@RequestBody RoleFunctionInputData roleFunctionData) {
+    public ResponseEntity<?> createRolesFunction(@PathVariable(name = "datasourceId")String datasourceId,@PathVariable(name = "tenantId")String tenantId,@RequestBody RoleFunctionInputData roleFunctionData) throws JsonProcessingException {
         return ResponseEntity.ok(this.roleService.saveRoleFunctions(roleFunctionData,Long.valueOf(tenantId),Long.valueOf(datasourceId)));
     }
 

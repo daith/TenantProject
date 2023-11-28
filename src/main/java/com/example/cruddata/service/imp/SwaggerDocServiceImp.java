@@ -31,14 +31,10 @@ import java.util.stream.Collectors;
 public class SwaggerDocServiceImp implements SwaggerDocService {
     @Autowired
     RoleFunctionRepository roleFunctionRepository;
-
     @Autowired
     FunctionRepository functionRepository;
-
     @Autowired
     TableConfigRepository tableConfigRepository;
-
-
     @Autowired
     ColumnConfigRepository columnConfigRepository;
 

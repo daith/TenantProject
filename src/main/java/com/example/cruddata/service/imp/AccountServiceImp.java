@@ -29,11 +29,6 @@ public class AccountServiceImp implements AccountService {
     @Autowired
     private  RedisUtil redisUtil;
 
-    public AccountServiceImp() {
-        super();
-    }
-
-
     @Override
     public List<Account> getAccountsByTenant(Long tenantId) {
 

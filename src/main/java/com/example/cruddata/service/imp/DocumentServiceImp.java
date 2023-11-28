@@ -38,7 +38,7 @@ public class DocumentServiceImp implements DocumentService {
 
 
     @Autowired
-    private SystemService systemService;
+    SystemService systemService;
 
     @Autowired
     DataSourceConfigRepository dataSourceConfigRepository;

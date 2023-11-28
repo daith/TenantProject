@@ -18,6 +18,7 @@ import com.example.cruddata.service.TableColumnService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
@@ -26,20 +27,19 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 @Service
-@RequiredArgsConstructor
 public class TableColumnServiceImp implements TableColumnService{
 
     private static final Logger log = LoggerFactory.getLogger(DocumentServiceImp.class);
-
-    public final ColumnConfigRepository columnConfigRepository;
-
-    public final TableConfigRepository tableConfigRepository;
-
-    public final RoleService roleService;
-
-    public final DataService dataService;
-
-    public final DataSourceService dataSourceService;
+    @Autowired
+    public  ColumnConfigRepository columnConfigRepository;
+    @Autowired
+    public  TableConfigRepository tableConfigRepository;
+    @Autowired
+    public  RoleService roleService;
+    @Autowired
+    public  DataService dataService;
+    @Autowired
+    public  DataSourceService dataSourceService;
 
     @Override
     public List<ColumnConfig> getActiveColumnByTenantIdAndTableId(Long tenantId, Long tableId) {
